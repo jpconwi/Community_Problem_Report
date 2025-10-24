@@ -72,10 +72,11 @@ router.post('/', auth, async (req, res) => {
                     problem_type,
                     location,
                     issue,
-                    date: new Date().toISOString(),
+                    date: new Date().toLocaleString(),
                     priority: priority || 'Medium',
                     photo_data: processedPhotoData,
-                    status: 'Pending'
+                    status: 'Pending',
+                    created_at: new Date().toISOString()
                 }
             ])
             .select()
@@ -128,7 +129,8 @@ router.put('/:id/status', auth, async (req, res) => {
                     user_id: report.user_id,
                     report_id: reportId,
                     message: `Your report status has been updated to ${status}`,
-                    type: 'status_update'
+                    type: 'status_update',
+                    created_at: new Date().toISOString()
                 }
             ]);
 
