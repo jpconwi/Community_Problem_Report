@@ -635,10 +635,10 @@ function showReportDetailModal(report, isAdmin = false) {
     const modal = document.getElementById('report-detail-modal');
     const content = document.getElementById('report-detail-content');
     
-    const cleanPriority = report.priority.replace('🟢 ', '')
+    const cleanPriority = report.priority ? report.priority.replace('🟢 ', '')
         .replace('🟡 ', '')
         .replace('🔴 ', '')
-        .replace('🚨 ', '');
+        .replace('🚨 ', '') : 'Medium';
     
     const statusColor = {
         'Pending': 'badge-pending',
@@ -662,8 +662,11 @@ function showReportDetailModal(report, isAdmin = false) {
                     <i class="fas fa-sync-alt"></i> Mark In Progress
                 </button>
                 ` : ''}
-                <button class="btn btn-secondary" id="mark-resolved-btn" data-id="${report.id}">
+                <button class="btn btn-primary" id="mark-resolved-btn" data-id="${report.id}">
                     <i class="fas fa-check-circle"></i> Mark Resolved
+                </button>
+                <button class="btn btn-danger" id="delete-report-btn" data-id="${report.id}">
+                    <i class="fas fa-trash"></i> Delete Report
                 </button>
             </div>
         `;
@@ -681,8 +684,15 @@ function showReportDetailModal(report, isAdmin = false) {
                 <div class="d-flex align-center mb-1">
                     <i class="fas fa-user" style="color: var(--gray-500); margin-right: 8px;"></i>
                     <span class="text-muted" style="width: 80px;">Name:</span>
-                    <span>${report.name}</span>
+                    <span>${report.name || report.users?.username || 'Unknown'}</span>
                 </div>
+                ${report.users?.email ? `
+                <div class="d-flex align-center mb-1">
+                    <i class="fas fa-envelope" style="color: var(--gray-500); margin-right: 8px;"></i>
+                    <span class="text-muted" style="width: 80px;">Email:</span>
+                    <span>${report.users.email}</span>
+                </div>
+                ` : ''}
             </div>
         </div>
         
@@ -707,7 +717,7 @@ function showReportDetailModal(report, isAdmin = false) {
                 <div class="d-flex align-center mb-1">
                     <i class="fas fa-calendar" style="color: var(--gray-500); margin-right: 8px;"></i>
                     <span class="text-muted" style="width: 100px;">Report Date:</span>
-                    <span>${report.date}</span>
+                    <span>${report.date || new Date(report.created_at).toLocaleString()}</span>
                 </div>
             </div>
         </div>
@@ -768,6 +778,27 @@ function showReportDetailModal(report, isAdmin = false) {
                     console.error('Error updating report status:', error);
                     showSnackbar('Error updating report status', 'error');
                 }
+            });
+        }
+        
+        if (document.getElementById('delete-report-btn')) {
+            document.getElementById('delete-report-btn').addEventListener('click', function() {
+                const reportId = this.getAttribute('data-id');
+                showConfirmModal(
+                    'Delete Report',
+                    'Are you sure you want to delete this report? This action cannot be undone.',
+                    async function() {
+                        try {
+                            await deleteReport(reportId);
+                            modal.style.display = 'none';
+                            loadAdminReports();
+                            updateAdminStats();
+                        } catch (error) {
+                            console.error('Error deleting report:', error);
+                            showSnackbar('Error deleting report', 'error');
+                        }
+                    }
+                );
             });
         }
     }
@@ -1061,4 +1092,5 @@ document.addEventListener('DOMContentLoaded', function() {
     
     console.log('Photo upload system initialized');
 });
+
 
