@@ -1,5 +1,5 @@
 const express = require('express');
-const { supabase } = require('../database/supabase'); // ✅ Changed from database to supabase
+const { supabase } = require('../database/supabase');
 const auth = require('../middleware/auth');
 
 const router = express.Router();
@@ -52,19 +52,6 @@ router.put('/:id/role', auth, async (req, res) => {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        // Add admin log
-        await supabase
-            .from('admin_logs')
-            .insert([
-                {
-                    admin_id: req.user.id,
-                    action: 'UPDATE_ROLE',
-                    target_type: 'user',
-                    target_id: userId,
-                    details: `Role changed to ${role}`
-                }
-            ]);
-
         res.json({ message: 'User role updated successfully' });
     } catch (error) {
         console.error('Error updating user role:', error);
@@ -81,7 +68,7 @@ router.delete('/:id', auth, async (req, res) => {
     const userId = req.params.id;
 
     try {
-        // Get user details for log
+        // Get user details for confirmation
         const { data: user, error: userError } = await supabase
             .from('users')
             .select('username')
@@ -93,26 +80,13 @@ router.delete('/:id', auth, async (req, res) => {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        // Delete user (this will cascade to reports and notifications due to ON DELETE CASCADE)
+        // Delete user (this will cascade to reports due to foreign key constraints)
         const { error: deleteError } = await supabase
             .from('users')
             .delete()
             .eq('id', userId);
 
         if (deleteError) throw deleteError;
-
-        // Add admin log
-        await supabase
-            .from('admin_logs')
-            .insert([
-                {
-                    admin_id: req.user.id,
-                    action: 'DELETE',
-                    target_type: 'user',
-                    target_id: userId,
-                    details: `Deleted user: ${user.username} and all their reports`
-                }
-            ]);
 
         res.json({ message: 'User deleted successfully' });
     } catch (error) {
