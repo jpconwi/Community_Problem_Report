@@ -202,26 +202,34 @@ function validatePhone(phone) {
 // Photo Upload Functionality
 function setupPhotoUpload() {
     const uploadBtn = document.getElementById('upload-photo-btn');
+    const chooseBtn = document.getElementById('choose-photo-btn');
     const clearBtn = document.getElementById('clear-photo-btn');
     const previewContainer = document.getElementById('photo-preview-container');
     const preview = document.getElementById('photo-preview');
+    const cameraInput = document.getElementById('photo-input');
+    const galleryInput = document.getElementById('gallery-input');
     
-    // Create hidden file input
-    const fileInput = document.createElement('input');
-    fileInput.type = 'file';
-    fileInput.accept = 'image/*';
-    fileInput.capture = 'environment'; // Use camera on mobile
-    fileInput.style.display = 'none';
-    document.body.appendChild(fileInput);
-    
-    // Upload button click handler
+    // Camera upload
     uploadBtn.addEventListener('click', () => {
-        fileInput.click();
+        cameraInput.click();
     });
     
-    // File selection handler
-    fileInput.addEventListener('change', function(e) {
-        const file = e.target.files[0];
+    // Gallery upload
+    chooseBtn.addEventListener('click', () => {
+        galleryInput.click();
+    });
+    
+    // Handle camera photo selection
+    cameraInput.addEventListener('change', function(e) {
+        handleImageSelection(e.target.files[0]);
+    });
+    
+    // Handle gallery photo selection
+    galleryInput.addEventListener('change', function(e) {
+        handleImageSelection(e.target.files[0]);
+    });
+    
+    function handleImageSelection(file) {
         if (!file) return;
         
         console.log('File selected:', file.name, file.size, file.type);
@@ -229,14 +237,12 @@ function setupPhotoUpload() {
         // Validate file size (max 5MB)
         if (file.size > 5 * 1024 * 1024) {
             showSnackbar('Image must be smaller than 5MB', 'error');
-            fileInput.value = ''; // Clear the file input
             return;
         }
         
         // Validate file type
         if (!file.type.startsWith('image/')) {
             showSnackbar('Please select an image file (JPEG, PNG, etc.)', 'error');
-            fileInput.value = ''; // Clear the file input
             return;
         }
         
@@ -245,24 +251,22 @@ function setupPhotoUpload() {
             console.log('File read successfully');
             preview.src = e.target.result;
             previewContainer.classList.remove('hidden');
-            clearBtn.classList.remove('hidden');
             showSnackbar('Photo added successfully! 📸');
         };
         
         reader.onerror = function() {
             showSnackbar('Error reading image file', 'error');
-            fileInput.value = ''; // Clear the file input
         };
         
         reader.readAsDataURL(file);
-    });
+    }
     
     // Clear photo button handler
     clearBtn.addEventListener('click', function() {
         preview.src = '';
         previewContainer.classList.add('hidden');
-        this.classList.add('hidden');
-        fileInput.value = ''; // Clear the file input
+        cameraInput.value = '';
+        galleryInput.value = '';
         showSnackbar('Photo removed', 'warning');
     });
 }
@@ -1057,3 +1061,4 @@ document.addEventListener('DOMContentLoaded', function() {
     
     console.log('Photo upload system initialized');
 });
+
