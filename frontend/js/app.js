@@ -196,6 +196,7 @@ function updateNavigation() {
 }
 
 // Enhanced Photo Upload System
+// Enhanced Photo Upload System
 function setupPhotoUpload() {
     const uploadBtn = document.getElementById('upload-photo-btn');
     const chooseBtn = document.getElementById('choose-photo-btn');
@@ -356,6 +357,7 @@ async function updateAdminStats() {
     }
 }
 // Add this function to debug and ensure proper loading
+// Add this function to debug and ensure proper loading
 function initializeApp() {
     console.log('Initializing CommunityCare app...');
     
@@ -381,6 +383,14 @@ function initializeApp() {
         console.error('Some login elements are missing');
     }
 }
+
+// Call this at the end of your DOMContentLoaded event listener
+document.addEventListener('DOMContentLoaded', function() {
+    // ... your existing code ...
+    
+    // Add this line at the end
+    initializeApp();
+});
 
 // Call this at the end of your DOMContentLoaded event listener
 document.addEventListener('DOMContentLoaded', function() {
@@ -435,6 +445,8 @@ async function loadAdminReports() {
                 'Resolved': 'badge-resolved'
             }[report.status] || 'badge-pending';
             
+            const reporterName = report.name || report.users?.username || 'Unknown';
+            
             const reportElement = document.createElement('div');
             reportElement.className = 'list-item';
             reportElement.innerHTML = `
@@ -442,7 +454,7 @@ async function loadAdminReports() {
                     <div>
                         <div class="list-item-title">${report.problem_type}</div>
                         <div class="list-item-subtitle">
-                            By: ${report.name || report.users?.username} • ${report.location} • ${report.date}
+                            By: ${reporterName} • ${report.location} • ${report.date}
                             ${report.photo_data ? ' 📷' : ''}
                         </div>
                     </div>
@@ -1012,57 +1024,58 @@ document.getElementById('login-form').addEventListener('submit', async function(
     });
     
     // Report submission form
-    document.getElementById('report-form').addEventListener('submit', async function(e) {
-        e.preventDefault();
+    // Report submission form
+document.getElementById('report-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const problemType = document.getElementById('problem-type').value.trim();
+    const location = document.getElementById('location').value.trim();
+    const issue = document.getElementById('issue').value.trim();
+    const priority = document.getElementById('priority').value;
+    const photoPreview = document.getElementById('photo-preview');
+    const submitBtn = document.getElementById('submit-report-btn');
+    
+    if (!problemType || !location || !issue) {
+        showSnackbar('Please fill in all required fields', 'error');
+        return;
+    }
+    
+    const reportData = {
+        problem_type: problemType,
+        location,
+        issue,
+        priority
+    };
+    
+    // Add photo data if available
+    if (photoPreview.src && photoPreview.src !== '') {
+        reportData.photo_data = photoPreview.src;
+    }
+    
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Submitting...';
+    
+    try {
+        await submitReport(reportData);
+        showSnackbar('Report submitted successfully! 🎉');
         
-        const problemType = document.getElementById('problem-type').value.trim();
-        const location = document.getElementById('location').value.trim();
-        const issue = document.getElementById('issue').value.trim();
-        const priority = document.getElementById('priority').value;
-        const photoPreview = document.getElementById('photo-preview');
-        const submitBtn = document.getElementById('submit-report-btn');
+        // Reset form
+        document.getElementById('problem-type').value = '';
+        document.getElementById('location').value = '';
+        document.getElementById('issue').value = '';
+        document.getElementById('priority').value = '🟡 Medium';
+        document.getElementById('photo-preview-container').classList.add('hidden');
+        document.getElementById('clear-photo-btn').classList.add('hidden');
         
-        if (!problemType || !location || !issue) {
-            showSnackbar('Please fill in all required fields', 'error');
-            return;
-        }
-        
-        const reportData = {
-            problem_type: problemType,
-            location,
-            issue,
-            priority
-        };
-        
-        // Add photo data if available
-        if (photoPreview.src && photoPreview.src !== '') {
-            reportData.photo_data = photoPreview.src;
-        }
-        
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Submitting...';
-        
-        try {
-            await submitReport(reportData);
-            showSnackbar('Report submitted successfully! 🎉');
-            
-            // Reset form
-            document.getElementById('problem-type').value = '';
-            document.getElementById('location').value = '';
-            document.getElementById('issue').value = '';
-            document.getElementById('priority').value = '🟡 Medium';
-            document.getElementById('photo-preview-container').classList.add('hidden');
-            document.getElementById('clear-photo-btn').classList.add('hidden');
-            
-            // Update dashboard stats
-            showUserDashboard();
-        } catch (error) {
-            showSnackbar(error.message, 'error');
-        } finally {
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Submit Report';
-        }
-    });
+        // Update dashboard stats
+        showUserDashboard();
+    } catch (error) {
+        showSnackbar(error.message, 'error');
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Submit Report';
+    }
+});
     
     // Navigation links
     document.getElementById('show-register').addEventListener('click', function(e) {
