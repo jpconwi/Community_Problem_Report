@@ -47,6 +47,7 @@ async function apiCall(endpoint, options = {}) {
 }
 
 // Auth functions
+// Auth functions
 async function loginUser(email, password) {
     const data = await apiCall('/auth/login', {
         method: 'POST',
@@ -58,6 +59,7 @@ async function loginUser(email, password) {
     localStorage.setItem('authToken', authToken);
     localStorage.setItem('currentUser', JSON.stringify(currentUser));
     
+    updateNavigation();
     return data;
 }
 
@@ -78,6 +80,7 @@ async function logoutUser() {
         currentUser = null;
         localStorage.removeItem('authToken');
         localStorage.removeItem('currentUser');
+        updateNavigation();
         showSnackbar('See you soon! 👋');
         showPage('login');
     }
@@ -168,6 +171,28 @@ function showSnackbar(message, type = 'success') {
 function validateEmail(email) {
     const pattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     return pattern.test(email);
+}
+
+// Navigation function
+function updateNavigation() {
+    const userNav = document.getElementById('user-nav');
+    const adminNav = document.getElementById('admin-nav');
+    const publicNav = document.getElementById('public-nav');
+    
+    // Hide all navs first
+    userNav.classList.add('hidden');
+    adminNav.classList.add('hidden');
+    publicNav.classList.add('hidden');
+    
+    if (currentUser) {
+        if (currentUser.role === 'admin') {
+            adminNav.classList.remove('hidden');
+        } else {
+            userNav.classList.remove('hidden');
+        }
+    } else {
+        publicNav.classList.remove('hidden');
+    }
 }
 
 // Enhanced Photo Upload System
@@ -330,6 +355,40 @@ async function updateAdminStats() {
         showSnackbar('Error loading stats', 'error');
     }
 }
+// Add this function to debug and ensure proper loading
+function initializeApp() {
+    console.log('Initializing CommunityCare app...');
+    
+    // Ensure login page is properly displayed
+    const loginPage = document.getElementById('login-page');
+    if (loginPage) {
+        loginPage.style.display = 'block';
+        loginPage.classList.add('active');
+    }
+    
+    // Check if elements exist
+    const loginForm = document.getElementById('login-form');
+    const emailInput = document.getElementById('login-email');
+    const passwordInput = document.getElementById('login-password');
+    
+    console.log('Login form exists:', !!loginForm);
+    console.log('Email input exists:', !!emailInput);
+    console.log('Password input exists:', !!passwordInput);
+    
+    if (loginForm && emailInput && passwordInput) {
+        console.log('All login elements found successfully');
+    } else {
+        console.error('Some login elements are missing');
+    }
+}
+
+// Call this at the end of your DOMContentLoaded event listener
+document.addEventListener('DOMContentLoaded', function() {
+    // ... your existing code ...
+    
+    // Add this line at the end
+    initializeApp();
+});
 
 function showAdminTab(tabName) {
     document.querySelectorAll('.tab').forEach(tab => {
@@ -856,6 +915,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (savedToken && savedUser) {
         authToken = savedToken;
         currentUser = JSON.parse(savedUser);
+        updateNavigation();
         
         if (currentUser.role === 'admin') {
             showAdminDashboard();
@@ -864,45 +924,47 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     } else {
         showPage('login');
+        updateNavigation();
     }
     
     // Login form
-    document.getElementById('login-form').addEventListener('submit', async function(e) {
-        e.preventDefault();
+    // Login form
+document.getElementById('login-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const email = document.getElementById('login-email').value.trim();
+    const password = document.getElementById('login-password').value;
+    const submitBtn = document.getElementById('login-submit');
+    
+    if (!email || !password) {
+        showSnackbar('Please fill in all fields', 'error');
+        return;
+    }
+    
+    if (!validateEmail(email)) {
+        showSnackbar('Please enter a valid email address', 'error');
+        return;
+    }
+    
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Signing In...';
+    
+    try {
+        const data = await loginUser(email, password);
+        showSnackbar(`Welcome back, ${data.user.username}! 👋`);
         
-        const email = document.getElementById('login-email').value.trim();
-        const password = document.getElementById('login-password').value;
-        const submitBtn = document.getElementById('login-submit');
-        
-        if (!email || !password) {
-            showSnackbar('Please fill in all fields', 'error');
-            return;
+        if (data.user.role === 'admin') {
+            showAdminDashboard();
+        } else {
+            showUserDashboard();
         }
-        
-        if (!validateEmail(email)) {
-            showSnackbar('Please enter a valid email address', 'error');
-            return;
-        }
-        
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Signing In...';
-        
-        try {
-            const data = await loginUser(email, password);
-            showSnackbar(`Welcome back, ${data.user.username}! 👋`);
-            
-            if (data.user.role === 'admin') {
-                showAdminDashboard();
-            } else {
-                showUserDashboard();
-            }
-        } catch (error) {
-            showSnackbar(error.message, 'error');
-        } finally {
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Sign In';
-        }
-    });
+    } catch (error) {
+        showSnackbar(error.message, 'error');
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Sign In';
+    }
+});
     
     // Register form
     document.getElementById('register-form').addEventListener('submit', async function(e) {
@@ -1036,6 +1098,32 @@ document.addEventListener('DOMContentLoaded', function() {
         showAdminDashboard();
     });
     
+    // Additional navigation buttons
+    document.getElementById('my-reports-btn').addEventListener('click', function(e) {
+        e.preventDefault();
+        showMyReports();
+    });
+    
+    document.getElementById('user-notifications-btn').addEventListener('click', function(e) {
+        e.preventDefault();
+        showNotifications();
+    });
+    
+    document.getElementById('back-to-dashboard').addEventListener('click', function(e) {
+        e.preventDefault();
+        showUserDashboard();
+    });
+    
+    document.getElementById('back-to-dashboard-2').addEventListener('click', function(e) {
+        e.preventDefault();
+        showUserDashboard();
+    });
+    
+    document.getElementById('public-login-link').addEventListener('click', function(e) {
+        e.preventDefault();
+        showPage('login');
+    });
+    
     // Admin tabs
     document.querySelectorAll('.tab').forEach(tab => {
         tab.addEventListener('click', function() {
@@ -1059,114 +1147,4 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
-    
-    // Show login page by default
-    showPage('login');
-
-    // Add these event listeners to fix navigation and login issues
-document.getElementById('my-reports-btn').addEventListener('click', function(e) {
-    e.preventDefault();
-    showMyReports();
 });
-
-document.getElementById('user-notifications-btn').addEventListener('click', function(e) {
-    e.preventDefault();
-    showNotifications();
-});
-
-document.getElementById('back-to-dashboard').addEventListener('click', function(e) {
-    e.preventDefault();
-    showUserDashboard();
-});
-
-document.getElementById('back-to-dashboard-2').addEventListener('click', function(e) {
-    e.preventDefault();
-    showUserDashboard();
-});
-
-document.getElementById('public-login-link').addEventListener('click', function(e) {
-    e.preventDefault();
-    showPage('login');
-});
-
-// Fix navigation visibility based on user role
-function updateNavigation() {
-    const userNav = document.getElementById('user-nav');
-    const adminNav = document.getElementById('admin-nav');
-    const publicNav = document.getElementById('public-nav');
-    
-    // Hide all navs first
-    userNav.classList.add('hidden');
-    adminNav.classList.add('hidden');
-    publicNav.classList.add('hidden');
-    
-    if (currentUser) {
-        if (currentUser.role === 'admin') {
-            adminNav.classList.remove('hidden');
-        } else {
-            userNav.classList.remove('hidden');
-        }
-    } else {
-        publicNav.classList.remove('hidden');
-    }
-}
-
-// Update the login and logout functions to call updateNavigation
-async function loginUser(email, password) {
-    const data = await apiCall('/auth/login', {
-        method: 'POST',
-        body: { email, password }
-    });
-    
-    authToken = data.token;
-    currentUser = data.user;
-    localStorage.setItem('authToken', authToken);
-    localStorage.setItem('currentUser', JSON.stringify(currentUser));
-    
-    updateNavigation(); // Add this line
-    return data;
-}
-
-async function logoutUser() {
-    try {
-        await apiCall('/auth/logout', { method: 'POST' });
-    } catch (error) {
-        console.error('Logout error:', error);
-    } finally {
-        authToken = null;
-        currentUser = null;
-        localStorage.removeItem('authToken');
-        localStorage.removeItem('currentUser');
-        updateNavigation(); // Add this line
-        showSnackbar('See you soon! 👋');
-        showPage('login');
-    }
-}
-
-// Also call updateNavigation when the app loads
-document.addEventListener('DOMContentLoaded', function() {
-    // ... existing code ...
-    
-    // Check if user is already logged in
-    const savedToken = localStorage.getItem('authToken');
-    const savedUser = localStorage.getItem('currentUser');
-    
-    if (savedToken && savedUser) {
-        authToken = savedToken;
-        currentUser = JSON.parse(savedUser);
-        updateNavigation(); // Add this line
-        
-        if (currentUser.role === 'admin') {
-            showAdminDashboard();
-        } else {
-            showUserDashboard();
-        }
-    } else {
-        showPage('login');
-        updateNavigation(); // Add this line
-    }
-    
-    // ... rest of existing code ...
-});
-});
-
