@@ -1,10 +1,10 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { supabase } = require('../database/supabase'); // Changed from database.js to supabase.js
+const { supabase } = require('../database/supabase');
 
 const router = express.Router();
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-here';
+const JWT_SECRET = process.env.JWT_SECRET || 'communitycare-secret-key-2024';
 
 // Login
 router.post('/login', async (req, res) => {
@@ -26,13 +26,20 @@ router.post('/login', async (req, res) => {
             return res.status(401).json({ message: 'Invalid email or password' });
         }
 
-        const isPasswordValid = bcrypt.compareSync(password, user.password);
+        // Check password
+        const isPasswordValid = await bcrypt.compare(password, user.password);
         if (!isPasswordValid) {
             return res.status(401).json({ message: 'Invalid email or password' });
         }
 
+        // Generate JWT token
         const token = jwt.sign(
-            { id: user.id, email: user.email, role: user.role },
+            { 
+                id: user.id, 
+                email: user.email, 
+                role: user.role,
+                username: user.username
+            },
             JWT_SECRET,
             { expiresIn: '24h' }
         );
@@ -53,7 +60,7 @@ router.post('/login', async (req, res) => {
 
 // Register
 router.post('/register', async (req, res) => {
-    const { username, email, phone, password } = req.body;
+    const { username, email, password } = req.body;
 
     if (!username || !email || !password) {
         return res.status(400).json({ message: 'Username, email, and password are required' });
@@ -65,19 +72,20 @@ router.post('/register', async (req, res) => {
 
     try {
         // Check if user already exists
-        const { data: existingUser, error: checkError } = await supabase
+        const { data: existingUser } = await supabase
             .from('users')
             .select('id')
             .or(`email.eq.${email},username.eq.${username}`)
             .single();
 
         if (existingUser) {
-            return res.status(409).json({ message: 'User already exists' });
+            return res.status(409).json({ message: 'User already exists with this email or username' });
         }
 
-        // Create new user
-        const hashedPassword = bcrypt.hashSync(password, 10);
+        // Hash password
+        const hashedPassword = await bcrypt.hash(password, 10);
         
+        // Create new user
         const { data: newUser, error: insertError } = await supabase
             .from('users')
             .insert([
@@ -85,7 +93,8 @@ router.post('/register', async (req, res) => {
                     username: username,
                     password: hashedPassword,
                     email: email,
-                    phone: phone || null
+                    role: 'user',
+                    created_at: new Date().toISOString()
                 }
             ])
             .select()
