@@ -5,6 +5,7 @@ const auth = require('../middleware/auth');
 const router = express.Router();
 
 // Get all reports (Admin only)
+// In reports.js - Update the Get all reports route
 router.get('/', auth, async (req, res) => {
     if (req.user.role !== 'admin') {
         return res.status(403).json({ message: 'Access denied' });
@@ -20,7 +21,15 @@ router.get('/', auth, async (req, res) => {
             .order('created_at', { ascending: false });
 
         if (error) throw error;
-        res.json({ reports });
+        
+        // Transform the data to ensure consistent structure
+        const formattedReports = reports.map(report => ({
+            ...report,
+            name: report.name || report.users?.username,
+            email: report.users?.email
+        }));
+        
+        res.json({ reports: formattedReports });
     } catch (error) {
         console.error('Error fetching reports:', error);
         res.status(500).json({ message: 'Database error' });
