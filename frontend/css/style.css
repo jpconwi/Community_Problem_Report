@@ -636,3 +636,59 @@ body {
 .page.active {
     animation: fadeIn 0.3s ease-in-out;
 }
+/* Add this to your existing CSS file */
+.btn-full {
+    width: 100%;
+}
+
+.h4 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--gray-800);
+}
+
+.navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+    color: var(--primary-color);
+    text-decoration: none;
+    font-size: 18px;
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: var(--gray-700);
+    text-decoration: none;
+    font-size: 14px;
+    position: relative;
+}
+
+.nav-link:hover {
+    color: var(--primary-color);
+}
+
+.card-header {
+    margin-bottom: 20px;
+}
+
+.card-header .btn {
+    width: auto;
+}
+
