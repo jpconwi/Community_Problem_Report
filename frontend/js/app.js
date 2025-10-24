@@ -1,4 +1,4 @@
-// Replace the first line with:
+// app.js - Complete Fixed Version
 const API_BASE_URL = 'https://communitycare-backend.onrender.com/api';
 
 // Current user state
@@ -15,7 +15,7 @@ const pages = {
     adminDashboard: document.getElementById('admin-dashboard')
 };
 
-// API Functions
+// Enhanced API Functions with better error handling
 async function apiCall(endpoint, options = {}) {
     const url = `${API_BASE_URL}${endpoint}`;
     const config = {
@@ -30,22 +30,26 @@ async function apiCall(endpoint, options = {}) {
         config.headers.Authorization = `Bearer ${authToken}`;
     }
 
-    if (options.body) {
+    if (options.body && typeof options.body !== 'string') {
+        config.body = JSON.stringify(options.body);
+    } else if (options.body) {
         config.body = options.body;
     }
 
     try {
+        console.log(`API Call: ${config.method || 'GET'} ${url}`);
         const response = await fetch(url, config);
-        const data = await response.json();
         
         if (!response.ok) {
-            throw new Error(data.message || 'API request failed');
+            const errorData = await response.json().catch(() => ({ message: 'Network error' }));
+            throw new Error(errorData.message || `HTTP ${response.status}`);
         }
         
+        const data = await response.json();
         return data;
     } catch (error) {
         console.error('API call failed:', error);
-        throw error;
+        throw new Error(error.message || 'Network error. Please check your connection.');
     }
 }
 
@@ -53,7 +57,7 @@ async function apiCall(endpoint, options = {}) {
 async function loginUser(email, password) {
     const data = await apiCall('/auth/login', {
         method: 'POST',
-        body: JSON.stringify({ email, password })
+        body: { email, password }
     });
     
     authToken = data.token;
@@ -67,7 +71,7 @@ async function loginUser(email, password) {
 async function registerUser(userData) {
     const data = await apiCall('/auth/register', {
         method: 'POST',
-        body: JSON.stringify(userData)
+        body: userData
     });
     
     return data;
@@ -92,7 +96,7 @@ async function logoutUser() {
 async function submitReport(reportData) {
     const data = await apiCall('/reports', {
         method: 'POST',
-        body: JSON.stringify(reportData)
+        body: reportData
     });
     
     return data;
@@ -100,18 +104,18 @@ async function submitReport(reportData) {
 
 async function getUserReports() {
     const data = await apiCall('/reports/my-reports');
-    return data.reports;
+    return data.reports || [];
 }
 
 async function getAllReports() {
     const data = await apiCall('/reports');
-    return data.reports;
+    return data.reports || [];
 }
 
 async function updateReportStatus(reportId, newStatus) {
     const data = await apiCall(`/reports/${reportId}/status`, {
         method: 'PUT',
-        body: JSON.stringify({ status: newStatus })
+        body: { status: newStatus }
     });
     
     return data;
@@ -128,13 +132,13 @@ async function deleteReport(reportId) {
 // Users API (Admin only)
 async function getAllUsers() {
     const data = await apiCall('/users');
-    return data.users;
+    return data.users || [];
 }
 
 async function updateUserRole(userId, newRole) {
     const data = await apiCall(`/users/${userId}/role`, {
         method: 'PUT',
-        body: JSON.stringify({ role: newRole })
+        body: { role: newRole }
     });
     
     return data;
@@ -151,7 +155,7 @@ async function deleteUser(userId) {
 // Notifications API
 async function getUserNotifications() {
     const data = await apiCall('/notifications');
-    return data.notifications;
+    return data.notifications || [];
 }
 
 async function markNotificationsAsRead() {
@@ -185,7 +189,7 @@ function showSnackbar(message, type = 'success') {
     
     setTimeout(() => {
         snackbar.style.display = 'none';
-    }, 3000);
+    }, 4000);
 }
 
 function validateEmail(email) {
@@ -199,7 +203,7 @@ function validatePhone(phone) {
     return pattern.test(phone);
 }
 
-// Photo Upload Functionality
+// Enhanced Photo Upload Functionality
 function setupPhotoUpload() {
     const uploadBtn = document.getElementById('upload-photo-btn');
     const chooseBtn = document.getElementById('choose-photo-btn');
@@ -208,6 +212,11 @@ function setupPhotoUpload() {
     const preview = document.getElementById('photo-preview');
     const cameraInput = document.getElementById('photo-input');
     const galleryInput = document.getElementById('gallery-input');
+    
+    if (!uploadBtn || !chooseBtn || !cameraInput || !galleryInput) {
+        console.error('Photo upload elements not found in HTML');
+        return;
+    }
     
     // Camera upload
     uploadBtn.addEventListener('click', () => {
@@ -251,6 +260,7 @@ function setupPhotoUpload() {
             console.log('File read successfully');
             preview.src = e.target.result;
             previewContainer.classList.remove('hidden');
+            if (clearBtn) clearBtn.classList.remove('hidden');
             showSnackbar('Photo added successfully! 📸');
         };
         
@@ -262,13 +272,16 @@ function setupPhotoUpload() {
     }
     
     // Clear photo button handler
-    clearBtn.addEventListener('click', function() {
-        preview.src = '';
-        previewContainer.classList.add('hidden');
-        cameraInput.value = '';
-        galleryInput.value = '';
-        showSnackbar('Photo removed', 'warning');
-    });
+    if (clearBtn) {
+        clearBtn.addEventListener('click', function() {
+            preview.src = '';
+            previewContainer.classList.add('hidden');
+            this.classList.add('hidden');
+            if (cameraInput) cameraInput.value = '';
+            if (galleryInput) galleryInput.value = '';
+            showSnackbar('Photo removed', 'warning');
+        });
+    }
 }
 
 // UI rendering functions
@@ -289,10 +302,10 @@ async function showUserDashboard() {
         const unreadCount = notifications.filter(n => !n.is_read).length;
         const notificationBadge = document.getElementById('notification-badge');
         
-        if (unreadCount > 0) {
+        if (unreadCount > 0 && notificationBadge) {
             notificationBadge.textContent = unreadCount;
             notificationBadge.classList.remove('hidden');
-        } else {
+        } else if (notificationBadge) {
             notificationBadge.classList.add('hidden');
         }
     } catch (error) {
@@ -305,8 +318,10 @@ async function showUserDashboard() {
     document.getElementById('location').value = '';
     document.getElementById('issue').value = '';
     document.getElementById('priority').value = '🟡 Medium';
-    document.getElementById('photo-preview-container').classList.add('hidden');
-    document.getElementById('clear-photo-btn').classList.add('hidden');
+    const previewContainer = document.getElementById('photo-preview-container');
+    const clearBtn = document.getElementById('clear-photo-btn');
+    if (previewContainer) previewContainer.classList.add('hidden');
+    if (clearBtn) clearBtn.classList.add('hidden');
 }
 
 async function showAdminDashboard() {
@@ -417,7 +432,7 @@ async function loadAdminReports() {
                     <div>
                         <div class="list-item-title">${report.problem_type}</div>
                         <div class="list-item-subtitle">
-                            By: ${report.name} • ${report.location} • ${report.date}
+                            By: ${report.name || report.users?.username} • ${report.location} • ${report.date}
                             ${report.photo_data ? ' 📷' : ''}
                         </div>
                     </div>
@@ -546,10 +561,10 @@ async function showMyReports() {
                 '🚨 Emergency': 'badge-emergency'
             }[report.priority] || 'badge-medium';
             
-            const cleanPriority = report.priority.replace('🟢 ', '')
+            const cleanPriority = report.priority ? report.priority.replace('🟢 ', '')
                 .replace('🟡 ', '')
                 .replace('🔴 ', '')
-                .replace('🚨 ', '');
+                .replace('🚨 ', '') : 'Medium';
             
             const reportElement = document.createElement('div');
             reportElement.className = 'card';
@@ -893,7 +908,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Setup photo upload - THIS IS CRITICAL!
+    // Setup photo upload
     setupPhotoUpload();
 
     // Login page
@@ -917,7 +932,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         } catch (error) {
             console.error('Login error:', error);
-            showSnackbar('Invalid email or password!', 'error');
+            showSnackbar(error.message || 'Login failed!', 'error');
         }
     });
     
@@ -980,7 +995,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const location = document.getElementById('location').value;
         const issue = document.getElementById('issue').value;
         const priority = document.getElementById('priority').value;
-        const photoData = document.getElementById('photo-preview').src || null;
+        const photoPreview = document.getElementById('photo-preview');
+        const photoData = photoPreview ? photoPreview.src : null;
         
         console.log('Submitting report with photo data:', photoData ? 'Yes' : 'No');
         
@@ -995,7 +1011,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 location,
                 issue,
                 priority,
-                photo_data: photoData
+                photo_data: photoData && photoData.startsWith('data:image') ? photoData : null
             });
             
             showSnackbar('Report submitted successfully! ✅');
@@ -1005,8 +1021,10 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('location').value = '';
             document.getElementById('issue').value = '';
             document.getElementById('priority').value = '🟡 Medium';
-            document.getElementById('photo-preview-container').classList.add('hidden');
-            document.getElementById('clear-photo-btn').classList.add('hidden');
+            const previewContainer = document.getElementById('photo-preview-container');
+            const clearBtn = document.getElementById('clear-photo-btn');
+            if (previewContainer) previewContainer.classList.add('hidden');
+            if (clearBtn) clearBtn.classList.add('hidden');
             
             // Refresh stats
             await showUserDashboard();
@@ -1090,7 +1108,5 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    console.log('Photo upload system initialized');
+    console.log('CommunityCare app initialized successfully!');
 });
-
-
