@@ -79,15 +79,6 @@ app.use((error, req, res, next) => {
     });
 });
 
-// Handle uncaught exceptions
-process.on('uncaughtException', (error) => {
-    console.error('Uncaught Exception:', error);
-});
-
-process.on('unhandledRejection', (reason, promise) => {
-    console.error('Unhandled Rejection at:', promise, 'reason:', reason);
-});
-
 // Initialize and start server
 console.log('🔄 Initializing CommunityCare Global Server...');
 
