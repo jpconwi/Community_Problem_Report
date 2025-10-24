@@ -1,5 +1,5 @@
-// API Base URL - Change this to your backend URL
-const API_BASE_URL = 'http://localhost:3000/api';
+// Replace the first line with:
+const API_BASE_URL = 'https://communitycare-backend.onrender.com/api';
 
 // Current user state
 let currentUser = null;
@@ -1057,3 +1057,4 @@ document.addEventListener('DOMContentLoaded', function() {
     
     console.log('Photo upload system initialized');
 });
+
