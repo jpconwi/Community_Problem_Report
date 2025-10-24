@@ -18,7 +18,7 @@ router.get('/', auth, async (req, res) => {
             .order('created_at', { ascending: false });
 
         if (error) throw error;
-        res.json({ users });
+        res.json({ users: users || [] });
     } catch (error) {
         console.error('Error fetching users:', error);
         res.status(500).json({ message: 'Database error' });
