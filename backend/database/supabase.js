@@ -24,7 +24,7 @@ async function testConnection() {
     }
 }
 
-// Initialize database (create admin user)
+// Initialize database (create admin user if not exists)
 async function initDatabase() {
     try {
         console.log('🔄 Initializing database...');
@@ -32,16 +32,17 @@ async function initDatabase() {
         const connected = await testConnection();
         if (!connected) throw new Error('Supabase connection failed');
 
-        // Check/create admin user
-        const { data: adminUser } = await supabase
+        // Check if admin user exists, if not create one
+        const { data: adminUser, error: adminCheckError } = await supabase
             .from('users')
             .select('id')
             .eq('email', 'admin@community.com')
             .single();
 
-        if (!adminUser) {
+        if (adminCheckError && adminCheckError.code === 'PGRST116') {
+            // Admin user doesn't exist, create one
             const hashedPassword = await bcrypt.hash('admin123', 10);
-            const { error } = await supabase
+            const { data: newAdmin, error: createError } = await supabase
                 .from('users')
                 .insert([
                     {
@@ -51,13 +52,19 @@ async function initDatabase() {
                         role: 'admin',
                         created_at: new Date().toISOString()
                     }
-                ]);
+                ])
+                .select()
+                .single();
 
-            if (!error) {
+            if (createError) {
+                console.error('❌ Error creating admin user:', createError);
+            } else {
                 console.log('✅ Admin user created');
                 console.log('   📧 Email: admin@community.com');
                 console.log('   🔑 Password: admin123');
             }
+        } else if (adminUser) {
+            console.log('✅ Admin user already exists');
         }
         
         console.log('✅ Database initialized');
