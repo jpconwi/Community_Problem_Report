@@ -1,11 +1,8 @@
-// app.js - Complete Fixed Version
 const API_BASE_URL = 'https://communitycare-backend.onrender.com/api';
 
-// Current user state
 let currentUser = null;
 let authToken = null;
 
-// DOM elements
 const pages = {
     login: document.getElementById('login-page'),
     register: document.getElementById('register-page'),
@@ -15,7 +12,7 @@ const pages = {
     adminDashboard: document.getElementById('admin-dashboard')
 };
 
-// Enhanced API Functions with better error handling
+// Enhanced API Functions
 async function apiCall(endpoint, options = {}) {
     const url = `${API_BASE_URL}${endpoint}`;
     const config = {
@@ -32,12 +29,9 @@ async function apiCall(endpoint, options = {}) {
 
     if (options.body && typeof options.body !== 'string') {
         config.body = JSON.stringify(options.body);
-    } else if (options.body) {
-        config.body = options.body;
     }
 
     try {
-        console.log(`API Call: ${config.method || 'GET'} ${url}`);
         const response = await fetch(url, config);
         
         if (!response.ok) {
@@ -45,15 +39,14 @@ async function apiCall(endpoint, options = {}) {
             throw new Error(errorData.message || `HTTP ${response.status}`);
         }
         
-        const data = await response.json();
-        return data;
+        return await response.json();
     } catch (error) {
         console.error('API call failed:', error);
         throw new Error(error.message || 'Network error. Please check your connection.');
     }
 }
 
-// Auth API
+// Auth functions
 async function loginUser(email, password) {
     const data = await apiCall('/auth/login', {
         method: 'POST',
@@ -69,12 +62,10 @@ async function loginUser(email, password) {
 }
 
 async function registerUser(userData) {
-    const data = await apiCall('/auth/register', {
+    return await apiCall('/auth/register', {
         method: 'POST',
         body: userData
     });
-    
-    return data;
 }
 
 async function logoutUser() {
@@ -92,14 +83,12 @@ async function logoutUser() {
     }
 }
 
-// Reports API
+// Report functions
 async function submitReport(reportData) {
-    const data = await apiCall('/reports', {
+    return await apiCall('/reports', {
         method: 'POST',
         body: reportData
     });
-    
-    return data;
 }
 
 async function getUserReports() {
@@ -113,57 +102,47 @@ async function getAllReports() {
 }
 
 async function updateReportStatus(reportId, newStatus) {
-    const data = await apiCall(`/reports/${reportId}/status`, {
+    return await apiCall(`/reports/${reportId}/status`, {
         method: 'PUT',
         body: { status: newStatus }
     });
-    
-    return data;
 }
 
 async function deleteReport(reportId) {
-    const data = await apiCall(`/reports/${reportId}`, {
+    return await apiCall(`/reports/${reportId}`, {
         method: 'DELETE'
     });
-    
-    return data;
 }
 
-// Users API (Admin only)
+// User management (Admin)
 async function getAllUsers() {
     const data = await apiCall('/users');
     return data.users || [];
 }
 
 async function updateUserRole(userId, newRole) {
-    const data = await apiCall(`/users/${userId}/role`, {
+    return await apiCall(`/users/${userId}/role`, {
         method: 'PUT',
         body: { role: newRole }
     });
-    
-    return data;
 }
 
 async function deleteUser(userId) {
-    const data = await apiCall(`/users/${userId}`, {
+    return await apiCall(`/users/${userId}`, {
         method: 'DELETE'
     });
-    
-    return data;
 }
 
-// Notifications API
+// Notifications
 async function getUserNotifications() {
     const data = await apiCall('/notifications');
     return data.notifications || [];
 }
 
 async function markNotificationsAsRead() {
-    const data = await apiCall('/notifications/read', {
+    return await apiCall('/notifications/read', {
         method: 'PUT'
     });
-    
-    return data;
 }
 
 // Utility functions
@@ -179,17 +158,11 @@ function showSnackbar(message, type = 'success') {
     snackbar.textContent = message;
     snackbar.className = 'snackbar';
     
-    if (type === 'error') {
-        snackbar.classList.add('error');
-    } else if (type === 'warning') {
-        snackbar.classList.add('warning');
-    }
+    if (type === 'error') snackbar.classList.add('error');
+    else if (type === 'warning') snackbar.classList.add('warning');
     
     snackbar.style.display = 'block';
-    
-    setTimeout(() => {
-        snackbar.style.display = 'none';
-    }, 4000);
+    setTimeout(() => { snackbar.style.display = 'none'; }, 4000);
 }
 
 function validateEmail(email) {
@@ -197,13 +170,7 @@ function validateEmail(email) {
     return pattern.test(email);
 }
 
-function validatePhone(phone) {
-    if (!phone) return true;
-    const pattern = /^\+?1?\d{9,15}$/;
-    return pattern.test(phone);
-}
-
-// Enhanced Photo Upload Functionality
+// Enhanced Photo Upload System
 function setupPhotoUpload() {
     const uploadBtn = document.getElementById('upload-photo-btn');
     const chooseBtn = document.getElementById('choose-photo-btn');
@@ -212,11 +179,6 @@ function setupPhotoUpload() {
     const preview = document.getElementById('photo-preview');
     const cameraInput = document.getElementById('photo-input');
     const galleryInput = document.getElementById('gallery-input');
-    
-    if (!uploadBtn || !chooseBtn || !cameraInput || !galleryInput) {
-        console.error('Photo upload elements not found in HTML');
-        return;
-    }
     
     // Camera upload
     uploadBtn.addEventListener('click', () => {
@@ -228,20 +190,9 @@ function setupPhotoUpload() {
         galleryInput.click();
     });
     
-    // Handle camera photo selection
-    cameraInput.addEventListener('change', function(e) {
-        handleImageSelection(e.target.files[0]);
-    });
-    
-    // Handle gallery photo selection
-    galleryInput.addEventListener('change', function(e) {
-        handleImageSelection(e.target.files[0]);
-    });
-    
+    // Handle file selection
     function handleImageSelection(file) {
         if (!file) return;
-        
-        console.log('File selected:', file.name, file.size, file.type);
         
         // Validate file size (max 5MB)
         if (file.size > 5 * 1024 * 1024) {
@@ -257,10 +208,9 @@ function setupPhotoUpload() {
         
         const reader = new FileReader();
         reader.onload = function(e) {
-            console.log('File read successfully');
             preview.src = e.target.result;
             previewContainer.classList.remove('hidden');
-            if (clearBtn) clearBtn.classList.remove('hidden');
+            clearBtn.classList.remove('hidden');
             showSnackbar('Photo added successfully! 📸');
         };
         
@@ -271,17 +221,23 @@ function setupPhotoUpload() {
         reader.readAsDataURL(file);
     }
     
-    // Clear photo button handler
-    if (clearBtn) {
-        clearBtn.addEventListener('click', function() {
-            preview.src = '';
-            previewContainer.classList.add('hidden');
-            this.classList.add('hidden');
-            if (cameraInput) cameraInput.value = '';
-            if (galleryInput) galleryInput.value = '';
-            showSnackbar('Photo removed', 'warning');
-        });
-    }
+    cameraInput.addEventListener('change', function(e) {
+        handleImageSelection(e.target.files[0]);
+    });
+    
+    galleryInput.addEventListener('change', function(e) {
+        handleImageSelection(e.target.files[0]);
+    });
+    
+    // Clear photo
+    clearBtn.addEventListener('click', function() {
+        preview.src = '';
+        previewContainer.classList.add('hidden');
+        this.classList.add('hidden');
+        cameraInput.value = '';
+        galleryInput.value = '';
+        showSnackbar('Photo removed', 'warning');
+    });
 }
 
 // UI rendering functions
@@ -302,10 +258,10 @@ async function showUserDashboard() {
         const unreadCount = notifications.filter(n => !n.is_read).length;
         const notificationBadge = document.getElementById('notification-badge');
         
-        if (unreadCount > 0 && notificationBadge) {
+        if (unreadCount > 0) {
             notificationBadge.textContent = unreadCount;
             notificationBadge.classList.remove('hidden');
-        } else if (notificationBadge) {
+        } else {
             notificationBadge.classList.add('hidden');
         }
     } catch (error) {
@@ -318,10 +274,8 @@ async function showUserDashboard() {
     document.getElementById('location').value = '';
     document.getElementById('issue').value = '';
     document.getElementById('priority').value = '🟡 Medium';
-    const previewContainer = document.getElementById('photo-preview-container');
-    const clearBtn = document.getElementById('clear-photo-btn');
-    if (previewContainer) previewContainer.classList.add('hidden');
-    if (clearBtn) clearBtn.classList.add('hidden');
+    document.getElementById('photo-preview-container').classList.add('hidden');
+    document.getElementById('clear-photo-btn').classList.add('hidden');
 }
 
 async function showAdminDashboard() {
@@ -378,19 +332,16 @@ async function updateAdminStats() {
 }
 
 function showAdminTab(tabName) {
-    // Update tabs
     document.querySelectorAll('.tab').forEach(tab => {
         tab.classList.remove('active');
     });
     document.querySelector(`.tab[data-tab="${tabName}"]`).classList.add('active');
     
-    // Update tab content
     document.querySelectorAll('.tab-content').forEach(content => {
         content.classList.remove('active');
     });
     document.getElementById(`${tabName}-tab`).classList.add('active');
     
-    // Load tab content
     if (tabName === 'reports') {
         loadAdminReports();
     } else if (tabName === 'users') {
@@ -438,7 +389,7 @@ async function loadAdminReports() {
                     </div>
                     <div class="d-flex align-center">
                         <span class="badge ${statusColor}">${report.status}</span>
-                        <div style="margin-left: 8px; position: relative;">
+                        <div style="margin-left: 8px;">
                             <button class="btn btn-secondary btn-sm admin-report-actions" data-id="${report.id}">
                                 <i class="fas fa-ellipsis-v"></i>
                             </button>
@@ -450,7 +401,7 @@ async function loadAdminReports() {
             reportsList.appendChild(reportElement);
         });
         
-        // Add event listeners to action buttons
+        // Add event listeners
         document.querySelectorAll('.admin-report-actions').forEach(button => {
             button.addEventListener('click', function() {
                 const reportId = this.getAttribute('data-id');
@@ -502,7 +453,6 @@ async function loadAdminUsers() {
             usersList.appendChild(userElement);
         });
         
-        // Add event listeners to action buttons
         document.querySelectorAll('.admin-user-actions').forEach(button => {
             button.addEventListener('click', function() {
                 const userId = this.getAttribute('data-id');
@@ -517,7 +467,6 @@ async function loadAdminUsers() {
 }
 
 async function loadAdminLogs() {
-    // For now, we'll show a placeholder since we don't have a logs API
     const logsList = document.getElementById('admin-logs-list');
     logsList.innerHTML = `
         <div class="empty-state">
@@ -588,7 +537,6 @@ async function showMyReports() {
             myReportsList.appendChild(reportElement);
         });
         
-        // Add event listeners to view details buttons
         document.querySelectorAll('.view-report-details').forEach(button => {
             button.addEventListener('click', async function() {
                 const reportId = this.getAttribute('data-id');
@@ -797,102 +745,110 @@ function showReportDetailModal(report, isAdmin = false) {
         }
         
         if (document.getElementById('delete-report-btn')) {
-            document.getElementById('delete-report-btn').addEventListener('click', function() {
-                const reportId = this.getAttribute('data-id');
-                showConfirmModal(
-                    'Delete Report',
-                    'Are you sure you want to delete this report? This action cannot be undone.',
-                    async function() {
-                        try {
-                            await deleteReport(reportId);
-                            modal.style.display = 'none';
-                            loadAdminReports();
-                            updateAdminStats();
-                        } catch (error) {
-                            console.error('Error deleting report:', error);
-                            showSnackbar('Error deleting report', 'error');
-                        }
+            document.getElementById('delete-report-btn').addEventListener('click', async function() {
+                if (confirm('Are you sure you want to delete this report? This action cannot be undone.')) {
+                    const reportId = this.getAttribute('data-id');
+                    try {
+                        await deleteReport(reportId);
+                        modal.style.display = 'none';
+                        loadAdminReports();
+                        updateAdminStats();
+                    } catch (error) {
+                        console.error('Error deleting report:', error);
+                        showSnackbar('Error deleting report', 'error');
                     }
-                );
+                }
             });
         }
     }
 }
 
-async function showUserActionsModal(user) {
-    const modal = document.getElementById('confirm-modal');
-    const title = document.getElementById('confirm-modal-title');
-    const message = document.getElementById('confirm-modal-message');
-    const confirmBtn = document.getElementById('confirm-action-btn');
+function showUserActionsModal(user) {
+    const modal = document.getElementById('user-actions-modal');
+    const content = document.getElementById('user-actions-content');
     
-    title.textContent = 'User Actions';
-    message.innerHTML = `
-        <p>User: <strong>${user.username}</strong></p>
-        <p>Email: ${user.email}</p>
-        <p>Current Role: ${user.role}</p>
+    content.innerHTML = `
+        <h3 class="h3 mb-2">User: ${user.username}</h3>
+        <div class="card mb-3">
+            <div class="d-flex align-center mb-1">
+                <i class="fas fa-envelope" style="color: var(--gray-500); margin-right: 8px;"></i>
+                <span class="text-muted" style="width: 60px;">Email:</span>
+                <span>${user.email}</span>
+            </div>
+            <div class="d-flex align-center mb-1">
+                <i class="fas fa-user-tag" style="color: var(--gray-500); margin-right: 8px;"></i>
+                <span class="text-muted" style="width: 60px;">Role:</span>
+                <span class="badge ${user.role === 'admin' ? 'badge-resolved' : 'badge-pending'}">${user.role}</span>
+            </div>
+        </div>
+        
+        <div class="action-buttons">
+            ${user.role !== 'admin' ? `
+            <button class="btn btn-primary" id="make-admin-btn" data-id="${user.id}">
+                <i class="fas fa-shield-alt"></i> Make Admin
+            </button>
+            ` : `
+            <button class="btn btn-secondary" id="make-user-btn" data-id="${user.id}">
+                <i class="fas fa-user"></i> Make Regular User
+            </button>
+            `}
+            <button class="btn btn-danger" id="delete-user-btn" data-id="${user.id}">
+                <i class="fas fa-trash"></i> Delete User
+            </button>
+        </div>
     `;
     
-    confirmBtn.textContent = user.role === 'user' ? 'Make Admin' : 'Make User';
-    confirmBtn.onclick = async function() {
-        const newRole = user.role === 'user' ? 'admin' : 'user';
-        try {
-            await updateUserRole(user.id, newRole);
-            modal.style.display = 'none';
-            loadAdminUsers();
-        } catch (error) {
-            console.error('Error updating user role:', error);
-            showSnackbar('Error updating user role', 'error');
-        }
-    };
+    modal.style.display = 'flex';
     
-    // Add delete button
-    const deleteBtn = document.createElement('button');
-    deleteBtn.className = 'btn btn-danger';
-    deleteBtn.textContent = 'Delete User';
-    deleteBtn.onclick = function() {
-        showConfirmModal(
-            'Confirm Delete',
-            'Are you sure you want to delete this user? All their reports will also be deleted.',
-            async function() {
-                try {
-                    await deleteUser(user.id);
-                    modal.style.display = 'none';
-                    loadAdminUsers();
-                    updateAdminStats();
-                } catch (error) {
-                    console.error('Error deleting user:', error);
-                    showSnackbar('Error deleting user', 'error');
-                }
+    // Add event listeners
+    if (document.getElementById('make-admin-btn')) {
+        document.getElementById('make-admin-btn').addEventListener('click', async function() {
+            const userId = this.getAttribute('data-id');
+            try {
+                await updateUserRole(userId, 'admin');
+                modal.style.display = 'none';
+                loadAdminUsers();
+            } catch (error) {
+                console.error('Error updating user role:', error);
+                showSnackbar('Error updating user role', 'error');
             }
-        );
-    };
+        });
+    }
     
-    const actionButtons = document.querySelector('.action-buttons');
-    actionButtons.innerHTML = '';
-    actionButtons.appendChild(confirmBtn);
-    actionButtons.appendChild(deleteBtn);
+    if (document.getElementById('make-user-btn')) {
+        document.getElementById('make-user-btn').addEventListener('click', async function() {
+            const userId = this.getAttribute('data-id');
+            try {
+                await updateUserRole(userId, 'user');
+                modal.style.display = 'none';
+                loadAdminUsers();
+            } catch (error) {
+                console.error('Error updating user role:', error);
+                showSnackbar('Error updating user role', 'error');
+            }
+        });
+    }
     
-    modal.style.display = 'flex';
-}
-
-function showConfirmModal(title, message, onConfirm) {
-    const modal = document.getElementById('confirm-modal');
-    const modalTitle = document.getElementById('confirm-modal-title');
-    const modalMessage = document.getElementById('confirm-modal-message');
-    const confirmBtn = document.getElementById('confirm-action-btn');
-    
-    modalTitle.textContent = title;
-    modalMessage.textContent = message;
-    confirmBtn.textContent = title.includes('Delete') ? 'Delete' : 'Confirm';
-    confirmBtn.className = title.includes('Delete') ? 'btn btn-danger' : 'btn btn-primary';
-    
-    confirmBtn.onclick = onConfirm;
-    
-    modal.style.display = 'flex';
+    document.getElementById('delete-user-btn').addEventListener('click', async function() {
+        if (confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
+            const userId = this.getAttribute('data-id');
+            try {
+                await deleteUser(userId);
+                modal.style.display = 'none';
+                loadAdminUsers();
+            } catch (error) {
+                console.error('Error deleting user:', error);
+                showSnackbar('Error deleting user', 'error');
+            }
+        }
+    });
 }
 
 // Event Listeners
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize photo upload system
+    setupPhotoUpload();
+    
     // Check if user is already logged in
     const savedToken = localStorage.getItem('authToken');
     const savedUser = localStorage.getItem('currentUser');
@@ -906,207 +862,204 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             showUserDashboard();
         }
+    } else {
+        showPage('login');
     }
-
-    // Setup photo upload
-    setupPhotoUpload();
-
-    // Login page
-    document.getElementById('login-btn').addEventListener('click', async function() {
-        const email = document.getElementById('login-email').value;
+    
+    // Login form
+    document.getElementById('login-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const email = document.getElementById('login-email').value.trim();
         const password = document.getElementById('login-password').value;
+        const submitBtn = document.getElementById('login-submit');
         
         if (!email || !password) {
-            showSnackbar('Please fill in all fields!', 'warning');
+            showSnackbar('Please fill in all fields', 'error');
             return;
         }
         
+        if (!validateEmail(email)) {
+            showSnackbar('Please enter a valid email address', 'error');
+            return;
+        }
+        
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Signing In...';
+        
         try {
-            await loginUser(email, password);
-            showSnackbar(`Welcome back, ${currentUser.username}! 👋`);
+            const data = await loginUser(email, password);
+            showSnackbar(`Welcome back, ${data.user.username}! 👋`);
             
-            if (currentUser.role === 'admin') {
+            if (data.user.role === 'admin') {
                 showAdminDashboard();
             } else {
                 showUserDashboard();
             }
         } catch (error) {
-            console.error('Login error:', error);
-            showSnackbar(error.message || 'Login failed!', 'error');
+            showSnackbar(error.message, 'error');
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Sign In';
         }
     });
     
-    document.getElementById('go-to-register').addEventListener('click', function(e) {
+    // Register form
+    document.getElementById('register-form').addEventListener('submit', async function(e) {
         e.preventDefault();
-        showPage('register');
-    });
-    
-    // Register page
-    document.getElementById('register-back').addEventListener('click', function() {
-        showPage('login');
-    });
-    
-    document.getElementById('register-btn').addEventListener('click', async function() {
-        const name = document.getElementById('register-name').value;
-        const email = document.getElementById('register-email').value;
-        const phone = document.getElementById('register-phone').value;
+        
+        const username = document.getElementById('register-username').value.trim();
+        const email = document.getElementById('register-email').value.trim();
         const password = document.getElementById('register-password').value;
         const confirmPassword = document.getElementById('register-confirm-password').value;
+        const submitBtn = document.getElementById('register-submit');
         
-        // Validation
-        if (!name || !email || !password || !confirmPassword) {
-            showSnackbar('Please fill in all required fields!', 'warning');
+        if (!username || !email || !password || !confirmPassword) {
+            showSnackbar('Please fill in all fields', 'error');
             return;
         }
         
         if (!validateEmail(email)) {
-            showSnackbar('Please enter a valid email address!', 'warning');
-            return;
-        }
-        
-        if (phone && !validatePhone(phone)) {
-            showSnackbar('Please enter a valid phone number!', 'warning');
-            return;
-        }
-        
-        if (password !== confirmPassword) {
-            showSnackbar('Passwords do not match!', 'warning');
+            showSnackbar('Please enter a valid email address', 'error');
             return;
         }
         
         if (password.length < 6) {
-            showSnackbar('Password must be at least 6 characters long!', 'warning');
+            showSnackbar('Password must be at least 6 characters long', 'error');
             return;
         }
         
+        if (password !== confirmPassword) {
+            showSnackbar('Passwords do not match', 'error');
+            return;
+        }
+        
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Creating Account...';
+        
         try {
-            await registerUser({ username: name, email, phone, password });
-            showSnackbar('Account created successfully! 🎉');
+            await registerUser({ username, email, password });
+            showSnackbar('Account created successfully! Please sign in. ✅');
             showPage('login');
         } catch (error) {
-            console.error('Registration error:', error);
-            showSnackbar(error.message || 'Registration failed!', 'error');
+            showSnackbar(error.message, 'error');
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Create Account';
         }
     });
     
-    // User dashboard - REPORT SUBMISSION WITH PHOTO
-    document.getElementById('submit-report-btn').addEventListener('click', async function() {
-        const problemType = document.getElementById('problem-type').value;
-        const location = document.getElementById('location').value;
-        const issue = document.getElementById('issue').value;
+    // Report submission form
+    document.getElementById('report-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const problemType = document.getElementById('problem-type').value.trim();
+        const location = document.getElementById('location').value.trim();
+        const issue = document.getElementById('issue').value.trim();
         const priority = document.getElementById('priority').value;
         const photoPreview = document.getElementById('photo-preview');
-        const photoData = photoPreview ? photoPreview.src : null;
-        
-        console.log('Submitting report with photo data:', photoData ? 'Yes' : 'No');
+        const submitBtn = document.getElementById('submit-report-btn');
         
         if (!problemType || !location || !issue) {
-            showSnackbar('Please fill in all required fields! 📝', 'warning');
+            showSnackbar('Please fill in all required fields', 'error');
             return;
         }
         
+        const reportData = {
+            problem_type: problemType,
+            location,
+            issue,
+            priority
+        };
+        
+        // Add photo data if available
+        if (photoPreview.src && photoPreview.src !== '') {
+            reportData.photo_data = photoPreview.src;
+        }
+        
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Submitting...';
+        
         try {
-            await submitReport({
-                problem_type: problemType,
-                location,
-                issue,
-                priority,
-                photo_data: photoData && photoData.startsWith('data:image') ? photoData : null
-            });
+            await submitReport(reportData);
+            showSnackbar('Report submitted successfully! 🎉');
             
-            showSnackbar('Report submitted successfully! ✅');
-            
-            // Clear form
+            // Reset form
             document.getElementById('problem-type').value = '';
             document.getElementById('location').value = '';
             document.getElementById('issue').value = '';
             document.getElementById('priority').value = '🟡 Medium';
-            const previewContainer = document.getElementById('photo-preview-container');
-            const clearBtn = document.getElementById('clear-photo-btn');
-            if (previewContainer) previewContainer.classList.add('hidden');
-            if (clearBtn) clearBtn.classList.add('hidden');
+            document.getElementById('photo-preview-container').classList.add('hidden');
+            document.getElementById('clear-photo-btn').classList.add('hidden');
             
-            // Refresh stats
-            await showUserDashboard();
+            // Update dashboard stats
+            showUserDashboard();
         } catch (error) {
-            console.error('Error submitting report:', error);
-            showSnackbar('Error submitting report: ' + error.message, 'error');
+            showSnackbar(error.message, 'error');
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Submit Report';
         }
     });
     
-    // Navigation buttons
-    document.getElementById('my-reports-btn').addEventListener('click', showMyReports);
-    document.getElementById('user-notifications-btn').addEventListener('click', showNotifications);
-    document.getElementById('user-logout-btn').addEventListener('click', logoutUser);
-    document.getElementById('notification-btn').addEventListener('click', showNotifications);
+    // Navigation links
+    document.getElementById('show-register').addEventListener('click', function(e) {
+        e.preventDefault();
+        showPage('register');
+    });
     
-    // Back buttons
-    document.getElementById('my-reports-back').addEventListener('click', showUserDashboard);
-    document.getElementById('notifications-back').addEventListener('click', showUserDashboard);
+    document.getElementById('show-login').addEventListener('click', function(e) {
+        e.preventDefault();
+        showPage('login');
+    });
     
-    // Admin dashboard
+    document.getElementById('logout-btn').addEventListener('click', logoutUser);
+    document.getElementById('admin-logout-btn').addEventListener('click', logoutUser);
+    
+    document.getElementById('my-reports-link').addEventListener('click', function(e) {
+        e.preventDefault();
+        showMyReports();
+    });
+    
+    document.getElementById('notifications-link').addEventListener('click', function(e) {
+        e.preventDefault();
+        showNotifications();
+    });
+    
+    document.getElementById('dashboard-link').addEventListener('click', function(e) {
+        e.preventDefault();
+        showUserDashboard();
+    });
+    
+    document.getElementById('admin-dashboard-link').addEventListener('click', function(e) {
+        e.preventDefault();
+        showAdminDashboard();
+    });
+    
+    // Admin tabs
     document.querySelectorAll('.tab').forEach(tab => {
         tab.addEventListener('click', function() {
-            showAdminTab(this.getAttribute('data-tab'));
+            const tabName = this.getAttribute('data-tab');
+            showAdminTab(tabName);
         });
     });
     
-    document.getElementById('refresh-reports-btn').addEventListener('click', function() {
-        loadAdminReports();
-        updateAdminStats();
-        showSnackbar('Reports refreshed!');
-    });
-    
-    document.getElementById('refresh-users-btn').addEventListener('click', function() {
-        loadAdminUsers();
-        showSnackbar('Users refreshed!');
-    });
-    
-    document.getElementById('refresh-logs-btn').addEventListener('click', function() {
-        loadAdminLogs();
-        showSnackbar('Logs refreshed!');
-    });
-    
-    document.getElementById('clear-logs-btn').addEventListener('click', function() {
-        showConfirmModal(
-            'Clear All Logs',
-            'Are you sure you want to clear all activity logs?',
-            function() {
-                // This would call a clear logs API if we had one
-                showSnackbar('Logs cleared!');
-                loadAdminLogs();
-            }
-        );
-    });
-    
-    document.getElementById('admin-logout-btn').addEventListener('click', logoutUser);
-    
     // Modal close buttons
-    document.getElementById('close-report-modal').addEventListener('click', function() {
-        document.getElementById('report-detail-modal').style.display = 'none';
-    });
-    
-    document.getElementById('close-confirm-modal').addEventListener('click', function() {
-        document.getElementById('confirm-modal').style.display = 'none';
-    });
-    
-    document.getElementById('cancel-action-btn').addEventListener('click', function() {
-        document.getElementById('confirm-modal').style.display = 'none';
+    document.querySelectorAll('.modal-close').forEach(button => {
+        button.addEventListener('click', function() {
+            this.closest('.modal').style.display = 'none';
+        });
     });
     
     // Close modals when clicking outside
-    window.addEventListener('click', function(e) {
-        const reportModal = document.getElementById('report-detail-modal');
-        const confirmModal = document.getElementById('confirm-modal');
-        
-        if (e.target === reportModal) {
-            reportModal.style.display = 'none';
-        }
-        
-        if (e.target === confirmModal) {
-            confirmModal.style.display = 'none';
-        }
+    document.querySelectorAll('.modal').forEach(modal => {
+        modal.addEventListener('click', function(e) {
+            if (e.target === this) {
+                this.style.display = 'none';
+            }
+        });
     });
     
-    console.log('CommunityCare app initialized successfully!');
+    // Show login page by default
+    showPage('login');
 });
