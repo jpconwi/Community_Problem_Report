@@ -3,1913 +3,332 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CommunityCare - Report System</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        :root {
-            --primary-color: #2563eb;
-            --primary-dark: #1d4ed8;
-            --success-color: #10b981;
-            --warning-color: #f59e0b;
-            --danger-color: #ef4444;
-            --gray-50: #f8fafc;
-            --gray-100: #f1f5f9;
-            --gray-200: #e2e8f0;
-            --gray-300: #cbd5e1;
-            --gray-400: #94a3b8;
-            --gray-500: #64748b;
-            --gray-600: #475569;
-            --gray-700: #334155;
-            --gray-800: #1e293b;
-            --gray-900: #0f172a;
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            --radius: 12px;
-            --radius-sm: 8px;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-        }
-
-        body {
-            background-color: var(--gray-50);
-            color: var(--gray-800);
-            line-height: 1.5;
-            min-height: 100vh;
-        }
-
-        .container {
-            max-width: 430px;
-            margin: 0 auto;
-            min-height: 100vh;
-            background-color: white;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-            position: relative;
-            overflow-x: hidden;
-        }
-
-        .page {
-            padding: 20px;
-            min-height: 100vh;
-            display: none;
-        }
-
-        .page.active {
-            display: block;
-        }
-
-        .card {
-            background: white;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-
-        .card-lg {
-            padding: 30px;
-        }
-
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 12px 20px;
-            border-radius: var(--radius);
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            border: none;
-            font-size: 14px;
-            width: 100%;
-            text-decoration: none;
-        }
-
-        .btn-primary {
-            background-color: var(--primary-color);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background-color: var(--primary-dark);
-            box-shadow: 0 4px 8px rgba(37, 99, 235, 0.2);
-        }
-
-        .btn-secondary {
-            background-color: white;
-            color: var(--primary-color);
-            border: 1px solid var(--primary-color);
-        }
-
-        .btn-secondary:hover {
-            background-color: var(--gray-50);
-        }
-
-        .btn-danger {
-            background-color: white;
-            color: var(--danger-color);
-            border: 1px solid var(--danger-color);
-        }
-
-        .btn-danger:hover {
-            background-color: #fef2f2;
-        }
-
-        .btn-sm {
-            padding: 8px 16px;
-            font-size: 13px;
-            width: auto;
-        }
-
-        .form-group {
-            margin-bottom: 16px;
-        }
-
-        .form-label {
-            display: block;
-            margin-bottom: 6px;
-            font-weight: 500;
-            color: var(--gray-700);
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 12px 16px;
-            border: 1px solid var(--gray-300);
-            border-radius: var(--radius);
-            font-size: 14px;
-            transition: border-color 0.2s;
-        }
-
-        .form-control:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-        }
-
-        .form-control.has-error {
-            border-color: var(--danger-color);
-        }
-
-        .error-message {
-            color: var(--danger-color);
-            font-size: 12px;
-            margin-top: 4px;
-            display: none;
-        }
-
-        .text-center {
-            text-align: center;
-        }
-
-        .text-right {
-            text-align: right;
-        }
-
-        .mb-1 {
-            margin-bottom: 8px;
-        }
-
-        .mb-2 {
-            margin-bottom: 16px;
-        }
-
-        .mb-3 {
-            margin-bottom: 24px;
-        }
-
-        .mt-1 {
-            margin-top: 8px;
-        }
-
-        .mt-2 {
-            margin-top: 16px;
-        }
-
-        .mt-3 {
-            margin-top: 24px;
-        }
-
-        .d-flex {
-            display: flex;
-        }
-
-        .align-center {
-            align-items: center;
-        }
-
-        .justify-between {
-            justify-content: space-between;
-        }
-
-        .justify-center {
-            justify-content: center;
-        }
-
-        .w-100 {
-            width: 100%;
-        }
-
-        .h1 {
-            font-size: 28px;
-            font-weight: 700;
-            color: var(--gray-800);
-        }
-
-        .h2 {
-            font-size: 20px;
-            font-weight: 600;
-            color: var(--gray-800);
-        }
-
-        .h3 {
-            font-size: 18px;
-            font-weight: 600;
-            color: var(--gray-800);
-        }
-
-        .text-muted {
-            color: var(--gray-500);
-        }
-
-        .text-small {
-            font-size: 14px;
-        }
-
-        .divider {
-            height: 1px;
-            background-color: var(--gray-200);
-            margin: 20px 0;
-        }
-
-        .badge {
-            display: inline-flex;
-            align-items: center;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .badge-pending {
-            background-color: #fef3c7;
-            color: #f59e0b;
-        }
-
-        .badge-in-progress {
-            background-color: #dbeafe;
-            color: #2563eb;
-        }
-
-        .badge-resolved {
-            background-color: #d1fae5;
-            color: #10b981;
-        }
-
-        .badge-priority {
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 10px;
-            font-weight: 600;
-        }
-
-        .badge-low {
-            background-color: #d1fae5;
-            color: #10b981;
-        }
-
-        .badge-medium {
-            background-color: #fef3c7;
-            color: #f59e0b;
-        }
-
-        .badge-high {
-            background-color: #fee2e2;
-            color: #ef4444;
-        }
-
-        .badge-emergency {
-            background-color: #fecaca;
-            color: #dc2626;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .stat-card {
-            background-color: var(--gray-50);
-            border-radius: 10px;
-            padding: 10px;
-            text-align: center;
-        }
-
-        .stat-icon {
-            font-size: 18px;
-            margin-bottom: 5px;
-        }
-
-        .stat-value {
-            font-size: 16px;
-            font-weight: 700;
-        }
-
-        .stat-label {
-            font-size: 12px;
-            color: var(--gray-500);
-        }
-
-        .tabs {
-            display: flex;
-            border-bottom: 1px solid var(--gray-200);
-            margin-bottom: 20px;
-        }
-
-        .tab {
-            padding: 12px 16px;
-            cursor: pointer;
-            font-weight: 500;
-            color: var(--gray-500);
-            border-bottom: 2px solid transparent;
-            transition: all 0.2s;
-        }
-
-        .tab.active {
-            color: var(--primary-color);
-            border-bottom-color: var(--primary-color);
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        .list-item {
-            padding: 16px 0;
-            border-bottom: 1px solid var(--gray-200);
-        }
-
-        .list-item:last-child {
-            border-bottom: none;
-        }
-
-        .list-item-title {
-            font-weight: 600;
-            margin-bottom: 4px;
-        }
-
-        .list-item-subtitle {
-            color: var(--gray-500);
-            font-size: 14px;
-        }
-
-        .notification-badge {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background-color: var(--danger-color);
-            color: white;
-            border-radius: 50%;
-            width: 18px;
-            height: 18px;
-            font-size: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 16px 0;
-        }
-
-        .back-button {
-            color: var(--gray-500);
-            background: none;
-            border: none;
-            font-size: 18px;
-            cursor: pointer;
-        }
-
-        .photo-preview {
-            width: 80px;
-            height: 80px;
-            border-radius: var(--radius);
-            object-fit: cover;
-            border: 1px solid var(--gray-200);
-        }
-
-        .snackbar {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: var(--success-color);
-            color: white;
-            padding: 12px 20px;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow-lg);
-            z-index: 1000;
-            display: none;
-            max-width: 90%;
-        }
-
-        .snackbar.error {
-            background-color: var(--danger-color);
-        }
-
-        .snackbar.warning {
-            background-color: var(--warning-color);
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal-content {
-            background-color: white;
-            border-radius: var(--radius);
-            width: 90%;
-            max-width: 400px;
-            max-height: 80vh;
-            overflow-y: auto;
-            padding: 20px;
-            box-shadow: var(--shadow-lg);
-        }
-
-        .modal-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 16px;
-        }
-
-        .modal-title {
-            font-size: 18px;
-            font-weight: 600;
-        }
-
-        .modal-close {
-            background: none;
-            border: none;
-            font-size: 18px;
-            cursor: pointer;
-            color: var(--gray-500);
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: var(--gray-500);
-        }
-
-        .empty-state i {
-            font-size: 48px;
-            margin-bottom: 16px;
-            color: var(--gray-300);
-        }
-
-        .report-image {
-            width: 100%;
-            max-height: 200px;
-            object-fit: contain;
-            border-radius: var(--radius);
-            border: 1px solid var(--gray-200);
-            margin-top: 10px;
-        }
-
-        .action-buttons {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-        }
-
-        .action-buttons .btn {
-            flex: 1;
-        }
-
-        .hidden {
-            display: none;
-        }
-    </style>
+    <title>CommunityCare - Global Problem Reporting</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-    <div class="container">
-        <!-- Login Page -->
-        <div id="login-page" class="page active">
-            <div class="card card-lg">
-                <div class="text-center mb-3">
-                    <i class="fas fa-city" style="font-size: 40px; color: var(--primary-color);"></i>
-                    <h1 class="h1 mt-1">CommunityCare</h1>
-                    <p class="text-muted">Report community issues with ease</p>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label" for="login-email">Email</label>
-                    <input type="email" id="login-email" class="form-control" placeholder="Enter your email">
-                    <div class="error-message" id="login-email-error"></div>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label" for="login-password">Password</label>
-                    <input type="password" id="login-password" class="form-control" placeholder="Enter your password">
-                    <div class="error-message" id="login-password-error"></div>
-                </div>
-                
-                <button class="btn btn-primary mb-2" id="login-btn">
-                    <i class="fas fa-sign-in-alt"></i> Sign In
-                </button>
-                
-                <div class="text-center">
-                    <p class="text-muted">Don't have an account? <a href="#" id="go-to-register">Sign Up</a></p>
-                </div>
-                
-                <div class="divider"></div>
-                
-                <div class="text-center">
-                    <p class="text-small text-muted">Demo Admin Account</p>
-                    <p class="text-small text-muted">Email: admin@community.com</p>
-                    <p class="text-small text-muted">Password: admin123</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Register Page -->
-        <div id="register-page" class="page">
-            <div class="header">
-                <button class="back-button" id="register-back">
-                    <i class="fas fa-arrow-left"></i>
-                </button>
-                <h2 class="h2">Create Account</h2>
-                <div style="width: 24px;"></div> <!-- Spacer for alignment -->
-            </div>
-            
-            <div class="card">
-                <div class="form-group">
-                    <label class="form-label" for="register-name">Full Name</label>
-                    <input type="text" id="register-name" class="form-control" placeholder="Enter your full name">
-                    <div class="error-message" id="register-name-error"></div>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label" for="register-email">Email</label>
-                    <input type="email" id="register-email" class="form-control" placeholder="Enter your email">
-                    <div class="error-message" id="register-email-error"></div>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label" for="register-phone">Phone (optional)</label>
-                    <input type="tel" id="register-phone" class="form-control" placeholder="Enter your phone number">
-                    <div class="error-message" id="register-phone-error"></div>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label" for="register-password">Password</label>
-                    <input type="password" id="register-password" class="form-control" placeholder="Enter your password">
-                    <div class="error-message" id="register-password-error"></div>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label" for="register-confirm-password">Confirm Password</label>
-                    <input type="password" id="register-confirm-password" class="form-control" placeholder="Confirm your password">
-                    <div class="error-message" id="register-confirm-password-error"></div>
-                </div>
-                
-                <button class="btn btn-primary" id="register-btn">
-                    <i class="fas fa-user-plus"></i> Create Account
-                </button>
-            </div>
-        </div>
-
-        <!-- User Dashboard -->
-        <div id="user-dashboard" class="page">
-            <div class="header">
-                <div>
-                    <h2 class="h2">Hello, <span id="user-name">User</span>! 👋</h2>
-                    <p class="text-muted">Report community issues</p>
-                </div>
-                <div style="position: relative;">
-                    <button class="btn btn-secondary btn-sm" id="notification-btn">
-                        <i class="fas fa-bell"></i>
-                    </button>
-                    <div class="notification-badge hidden" id="notification-badge">0</div>
-                </div>
-            </div>
-            
-            <div class="card">
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-icon" style="color: var(--primary-color);">
-                            <i class="fas fa-file-alt"></i>
-                        </div>
-                        <div class="stat-value" id="user-reports-count">0</div>
-                        <div class="stat-label">Your Reports</div>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <nav class="navbar">
+                <a href="#" class="logo">
+                    <i class="fas fa-hands-helping"></i>
+                    CommunityCare
+                </a>
+                <div class="nav-links">
+                    <!-- User Navigation -->
+                    <div id="user-nav" class="nav-links">
+                        <a href="#" class="nav-link" id="dashboard-link">
+                            <i class="fas fa-home"></i> Dashboard
+                        </a>
+                        <a href="#" class="nav-link" id="my-reports-link">
+                            <i class="fas fa-file-alt"></i> My Reports
+                        </a>
+                        <a href="#" class="nav-link" id="notifications-link">
+                            <i class="fas fa-bell"></i> Notifications
+                            <span id="notification-badge" class="notification-badge hidden">0</span>
+                        </a>
+                        <button class="btn btn-secondary btn-sm" id="logout-btn">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </button>
                     </div>
-                    <div class="stat-card">
-                        <div class="stat-icon" style="color: var(--warning-color);">
-                            <i class="fas fa-clock"></i>
+                    
+                    <!-- Admin Navigation -->
+                    <div id="admin-nav" class="nav-links">
+                        <a href="#" class="nav-link" id="admin-dashboard-link">
+                            <i class="fas fa-tachometer-alt"></i> Admin Dashboard
+                        </a>
+                        <button class="btn btn-secondary btn-sm" id="admin-logout-btn">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </button>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Login Page -->
+            <div id="login-page" class="page active">
+                <div class="auth-container">
+                    <div class="auth-card">
+                        <div class="auth-header">
+                            <div class="auth-logo">
+                                <i class="fas fa-hands-helping"></i>
+                                CommunityCare
+                            </div>
+                            <p class="auth-subtitle">Sign in to your account</p>
                         </div>
-                        <div class="stat-value" id="user-pending-count">0</div>
-                        <div class="stat-label">Pending</div>
+                        <form id="login-form">
+                            <div class="form-group">
+                                <label for="login-email" class="form-label">Email Address</label>
+                                <input type="email" id="login-email" class="form-control" placeholder="Enter your email" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="login-password" class="form-label">Password</label>
+                                <input type="password" id="login-password" class="form-control" placeholder="Enter your password" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-full" id="login-submit">
+                                <i class="fas fa-sign-in-alt"></i> Sign In
+                            </button>
+                        </form>
+                        <div class="auth-footer">
+                            <p>Don't have an account? <a href="#" id="show-register" class="auth-link">Sign up</a></p>
+                        </div>
                     </div>
                 </div>
             </div>
-            
-            <div class="card">
-                <h3 class="h3 mb-2">New Report</h3>
-                
-                <div class="form-group">
-                    <label class="form-label" for="problem-type">Problem Type</label>
-                    <select id="problem-type" class="form-control">
-                        <option value="">Select problem type</option>
-                        <option value="🚧 Infrastructure">🚧 Infrastructure</option>
-                        <option value="🧹 Sanitation">🧹 Sanitation</option>
-                        <option value="🛡️ Safety">🛡️ Safety</option>
-                        <option value="🌳 Environment">🌳 Environment</option>
-                        <option value="🔊 Noise">🔊 Noise</option>
-                        <option value="❓ Other">❓ Other</option>
-                    </select>
-                    <div class="error-message" id="problem-type-error"></div>
+
+            <!-- Register Page -->
+            <div id="register-page" class="page">
+                <div class="auth-container">
+                    <div class="auth-card">
+                        <div class="auth-header">
+                            <div class="auth-logo">
+                                <i class="fas fa-hands-helping"></i>
+                                CommunityCare
+                            </div>
+                            <p class="auth-subtitle">Create your account</p>
+                        </div>
+                        <form id="register-form">
+                            <div class="form-group">
+                                <label for="register-username" class="form-label">Username</label>
+                                <input type="text" id="register-username" class="form-control" placeholder="Choose a username" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="register-email" class="form-label">Email Address</label>
+                                <input type="email" id="register-email" class="form-control" placeholder="Enter your email" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="register-password" class="form-label">Password</label>
+                                <input type="password" id="register-password" class="form-control" placeholder="Create a password (min. 6 characters)" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="register-confirm-password" class="form-label">Confirm Password</label>
+                                <input type="password" id="register-confirm-password" class="form-control" placeholder="Confirm your password" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-full" id="register-submit">
+                                <i class="fas fa-user-plus"></i> Create Account
+                            </button>
+                        </form>
+                        <div class="auth-footer">
+                            <p>Already have an account? <a href="#" id="show-login" class="auth-link">Sign in</a></p>
+                        </div>
+                    </div>
                 </div>
-                
-                <div class="form-group">
-                    <label class="form-label" for="location">Location</label>
-                    <input type="text" id="location" class="form-control" placeholder="Enter exact location">
-                    <div class="error-message" id="location-error"></div>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label" for="issue">Description</label>
-                    <textarea id="issue" class="form-control" rows="3" placeholder="Describe the problem in detail..."></textarea>
-                    <div class="error-message" id="issue-error"></div>
-                </div>
-                
-                <div class="form-group">
-                    <label class="form-label" for="priority">Priority Level</label>
-                    <select id="priority" class="form-control">
-                        <option value="🟢 Low">🟢 Low</option>
-                        <option value="🟡 Medium" selected>🟡 Medium</option>
-                        <option value="🔴 High">🔴 High</option>
-                        <option value="🚨 Emergency">🚨 Emergency</option>
-                    </select>
-                </div>
-                
-                <!-- In the user dashboard card, replace the photo upload section with this: -->
-<div class="form-group">
-    <label class="form-label">Attach Photo</label>
-    <div class="d-flex justify-between align-center mb-2">
-        <button class="btn btn-secondary btn-sm" id="upload-photo-btn" type="button">
-            <i class="fas fa-camera"></i> Take Photo
-        </button>
-        <button class="btn btn-secondary btn-sm" id="choose-photo-btn" type="button">
-            <i class="fas fa-image"></i> Choose Photo
-        </button>
-    </div>
-    
-    <!-- Hidden file inputs -->
-    <input type="file" id="photo-input" accept="image/*" capture="environment" style="display: none;">
-    <input type="file" id="gallery-input" accept="image/*" style="display: none;">
-    
-    <!-- Photo preview -->
-    <div id="photo-preview-container" class="mt-2 hidden">
-        <img id="photo-preview" class="photo-preview" src="" alt="Photo preview">
-        <button class="btn btn-danger btn-sm mt-1" id="clear-photo-btn" type="button">
-            <i class="fas fa-trash"></i> Remove Photo
-        </button>
-    </div>
-</div>
-                
-                <button class="btn btn-primary" id="submit-report-btn">
-                    <i class="fas fa-paper-plane"></i> Submit Report
-                </button>
             </div>
-            
-            <div class="card">
-                <h3 class="h3 mb-2">Quick Actions</h3>
-                
-                <div class="d-flex justify-between mb-2">
-                    <button class="btn btn-secondary btn-sm" id="my-reports-btn">
-                        <i class="fas fa-list-alt"></i> My Reports
-                    </button>
-                    <button class="btn btn-secondary btn-sm" id="user-notifications-btn">
-                        <i class="fas fa-bell"></i> Notifications
-                    </button>
+
+            <!-- User Dashboard -->
+            <div id="user-dashboard" class="page">
+                <div class="card">
+                    <div class="card-header">
+                        <h1 class="h1">Welcome, <span id="user-name"></span>! 👋</h1>
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-icon">
+                                    <i class="fas fa-file-alt"></i>
+                                </div>
+                                <div class="stat-value" id="user-reports-count">0</div>
+                                <div class="stat-label">Total Reports</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                                <div class="stat-value" id="user-pending-count">0</div>
+                                <div class="stat-label">Pending</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                
-                <button class="btn btn-danger" id="user-logout-btn">
-                    <i class="fas fa-sign-out-alt"></i> Logout
-                </button>
+
+                <div class="card">
+                    <h2 class="h2 mb-3">Submit New Report</h2>
+                    <form id="report-form">
+                        <div class="form-group">
+                            <label for="problem-type" class="form-label">Problem Type *</label>
+                            <select id="problem-type" class="form-control" required>
+                                <option value="">Select problem type</option>
+                                <option value="Pothole">🕳️ Pothole</option>
+                                <option value="Street Light">💡 Street Light</option>
+                                <option value="Garbage Collection">🗑️ Garbage Collection</option>
+                                <option value="Water Leak">💧 Water Leak</option>
+                                <option value="Road Damage">🛣️ Road Damage</option>
+                                <option value="Public Safety">👮 Public Safety</option>
+                                <option value="Noise Complaint">🔊 Noise Complaint</option>
+                                <option value="Other">❓ Other</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="location" class="form-label">Location *</label>
+                            <input type="text" id="location" class="form-control" placeholder="Enter exact location (street, landmark, etc.)" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="priority" class="form-label">Priority Level</label>
+                            <select id="priority" class="form-control">
+                                <option value="🟢 Low">🟢 Low</option>
+                                <option value="🟡 Medium" selected>🟡 Medium</option>
+                                <option value="🔴 High">🔴 High</option>
+                                <option value="🚨 Emergency">🚨 Emergency</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="issue" class="form-label">Issue Description *</label>
+                            <textarea id="issue" class="form-control" rows="4" placeholder="Describe the problem in detail..." required></textarea>
+                        </div>
+
+                        <!-- Photo Upload Section -->
+                        <div class="form-group">
+                            <label class="form-label">Add Photo (Optional)</label>
+                            <div class="photo-upload-section">
+                                <div class="photo-upload-buttons">
+                                    <button type="button" class="btn btn-primary" id="upload-photo-btn">
+                                        <i class="fas fa-camera"></i> Take Photo
+                                    </button>
+                                    <button type="button" class="btn btn-secondary" id="choose-photo-btn">
+                                        <i class="fas fa-image"></i> Choose from Gallery
+                                    </button>
+                                </div>
+                                <p class="text-small text-muted">Max file size: 5MB • Supported: JPEG, PNG</p>
+                                
+                                <!-- Hidden file inputs -->
+                                <input type="file" id="photo-input" accept="image/*" capture="camera" class="hidden">
+                                <input type="file" id="gallery-input" accept="image/*" class="hidden">
+                                
+                                <!-- Photo Preview -->
+                                <div id="photo-preview-container" class="photo-preview-container hidden">
+                                    <img id="photo-preview" class="photo-preview" alt="Photo preview">
+                                    <button type="button" class="btn btn-danger btn-sm mt-2" id="clear-photo-btn">
+                                        <i class="fas fa-trash"></i> Remove Photo
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-full" id="submit-report-btn">
+                            <i class="fas fa-paper-plane"></i> Submit Report
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- My Reports Page -->
+            <div id="my-reports-page" class="page">
+                <div class="card">
+                    <h1 class="h1 mb-3">My Reports</h1>
+                    <div id="my-reports-list">
+                        <!-- Reports will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notifications Page -->
+            <div id="notifications-page" class="page">
+                <div class="card">
+                    <h1 class="h1 mb-3">Notifications</h1>
+                    <div id="notifications-list">
+                        <!-- Notifications will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin Dashboard -->
+            <div id="admin-dashboard" class="page">
+                <div class="card">
+                    <h1 class="h1 mb-3">Admin Dashboard</h1>
+                    
+                    <!-- Stats Grid -->
+                    <div id="admin-stats" class="stats-grid">
+                        <!-- Stats will be loaded here -->
+                    </div>
+
+                    <!-- Tabs -->
+                    <div class="tabs">
+                        <button class="tab active" data-tab="reports">
+                            <i class="fas fa-file-alt"></i> Reports
+                        </button>
+                        <button class="tab" data-tab="users">
+                            <i class="fas fa-users"></i> Users
+                        </button>
+                        <button class="tab" data-tab="logs">
+                            <i class="fas fa-history"></i> Activity Logs
+                        </button>
+                    </div>
+
+                    <!-- Reports Tab -->
+                    <div id="reports-tab" class="tab-content active">
+                        <div class="card">
+                            <h2 class="h2 mb-3">Community Reports</h2>
+                            <div id="admin-reports-list">
+                                <!-- Reports will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Users Tab -->
+                    <div id="users-tab" class="tab-content">
+                        <div class="card">
+                            <h2 class="h2 mb-3">User Management</h2>
+                            <div id="admin-users-list">
+                                <!-- Users will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Logs Tab -->
+                    <div id="logs-tab" class="tab-content">
+                        <div class="card">
+                            <h2 class="h2 mb-3">Activity Logs</h2>
+                            <div id="admin-logs-list">
+                                <!-- Logs will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-
-        <!-- My Reports Page -->
-        <div id="my-reports-page" class="page">
-            <div class="header">
-                <button class="back-button" id="my-reports-back">
-                    <i class="fas fa-arrow-left"></i>
-                </button>
-                <h2 class="h2">My Reports</h2>
-                <i class="fas fa-file-alt" style="color: var(--primary-color);"></i>
-            </div>
-            
-            <div id="my-reports-list">
-                <!-- Reports will be populated here -->
-            </div>
-        </div>
-
-        <!-- Notifications Page -->
-        <div id="notifications-page" class="page">
-            <div class="header">
-                <button class="back-button" id="notifications-back">
-                    <i class="fas fa-arrow-left"></i>
-                </button>
-                <h2 class="h2">Notifications</h2>
-                <i class="fas fa-bell" style="color: var(--primary-color);"></i>
-            </div>
-            
-            <div id="notifications-list">
-                <!-- Notifications will be populated here -->
-            </div>
-        </div>
-
-        <!-- Admin Dashboard -->
-        <div id="admin-dashboard" class="page">
-            <div class="header">
-                <div class="d-flex align-center">
-                    <i class="fas fa-user-shield" style="color: var(--primary-color); margin-right: 8px;"></i>
-                    <h2 class="h2">Admin Dashboard</h2>
-                </div>
-                <button class="btn btn-danger btn-sm" id="admin-logout-btn">
-                    <i class="fas fa-sign-out-alt"></i> Logout
-                </button>
-            </div>
-            
-            <div class="card">
-                <div class="stats-grid" id="admin-stats">
-                    <!-- Stats will be populated here -->
-                </div>
-            </div>
-            
-            <div class="tabs">
-                <div class="tab active" data-tab="reports">Community Reports</div>
-                <div class="tab" data-tab="users">User Management</div>
-                <div class="tab" data-tab="logs">Activity Log</div>
-            </div>
-            
-            <div class="tab-content active" id="reports-tab">
-                <h3 class="h3 mb-2">Community Reports Management</h3>
-                <p class="text-muted mb-2">Manage all community reports</p>
-                
-                <div id="admin-reports-list">
-                    <!-- Reports will be populated here -->
-                </div>
-                
-                <button class="btn btn-primary" id="refresh-reports-btn">
-                    <i class="fas fa-sync-alt"></i> Refresh All
-                </button>
-            </div>
-            
-            <div class="tab-content" id="users-tab">
-                <h3 class="h3 mb-2">User Management</h3>
-                <p class="text-muted mb-2">Manage user accounts and permissions</p>
-                
-                <div id="admin-users-list">
-                    <!-- Users will be populated here -->
-                </div>
-                
-                <button class="btn btn-primary" id="refresh-users-btn">
-                    <i class="fas fa-sync-alt"></i> Refresh
-                </button>
-            </div>
-            
-            <div class="tab-content" id="logs-tab">
-                <div class="d-flex justify-between align-center mb-2">
-                    <h3 class="h3">Admin Activity Log</h3>
-                    <button class="btn btn-secondary btn-sm" id="clear-logs-btn">
-                        <i class="fas fa-trash"></i> Clear Logs
-                    </button>
-                </div>
-                <p class="text-muted mb-2">Recent admin activities and actions</p>
-                
-                <div id="admin-logs-list">
-                    <!-- Logs will be populated here -->
-                </div>
-                
-                <button class="btn btn-primary" id="refresh-logs-btn">
-                    <i class="fas fa-sync-alt"></i> Refresh
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Snackbar for notifications -->
-    <div class="snackbar" id="snackbar"></div>
+    </main>
 
     <!-- Modals -->
-    <div class="modal" id="report-detail-modal">
+    <!-- Report Detail Modal -->
+    <div id="report-detail-modal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 class="modal-title">Report Details</h3>
-                <button class="modal-close" id="close-report-modal">&times;</button>
+                <h2 class="h2">Report Details</h2>
+                <button class="modal-close">&times;</button>
             </div>
-            <div id="report-detail-content">
-                <!-- Report details will be populated here -->
+            <div class="modal-body">
+                <div id="report-detail-content">
+                    <!-- Report details will be loaded here -->
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="modal" id="confirm-modal">
+    <!-- User Actions Modal -->
+    <div id="user-actions-modal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 class="modal-title" id="confirm-modal-title">Confirm Action</h3>
-                <button class="modal-close" id="close-confirm-modal">&times;</button>
+                <h2 class="h2">User Actions</h2>
+                <button class="modal-close">&times;</button>
             </div>
-            <p id="confirm-modal-message">Are you sure you want to proceed?</p>
-            <div class="action-buttons">
-                <button class="btn btn-danger" id="confirm-action-btn">Confirm</button>
-                <button class="btn btn-secondary" id="cancel-action-btn">Cancel</button>
+            <div class="modal-body">
+                <div id="user-actions-content">
+                    <!-- User actions will be loaded here -->
+                </div>
             </div>
         </div>
     </div>
 
-    <script>
-        // Data storage (simulating a database)
-        let users = JSON.parse(localStorage.getItem('users')) || [];
-        let reports = JSON.parse(localStorage.getItem('reports')) || [];
-        let notifications = JSON.parse(localStorage.getItem('notifications')) || [];
-        let adminLogs = JSON.parse(localStorage.getItem('adminLogs')) || [];
-        
-        // Initialize with demo data if empty
-        if (users.length === 0) {
-            users = [
-                {
-                    id: 1,
-                    username: 'admin',
-                    password: 'admin123',
-                    email: 'admin@community.com',
-                    role: 'admin',
-                    created_at: new Date().toISOString()
-                }
-            ];
-            localStorage.setItem('users', JSON.stringify(users));
-        }
-        
-        // Current user state
-        let currentUser = null;
-        
-        // DOM elements
-        const pages = {
-            login: document.getElementById('login-page'),
-            register: document.getElementById('register-page'),
-            userDashboard: document.getElementById('user-dashboard'),
-            myReports: document.getElementById('my-reports-page'),
-            notifications: document.getElementById('notifications-page'),
-            adminDashboard: document.getElementById('admin-dashboard')
-        };
-        
-        // Utility functions
-        function showPage(pageId) {
-            // Hide all pages
-            Object.values(pages).forEach(page => {
-                page.classList.remove('active');
-            });
-            
-            // Show the requested page
-            pages[pageId].classList.add('active');
-        }
-        
-        function showSnackbar(message, type = 'success') {
-            const snackbar = document.getElementById('snackbar');
-            snackbar.textContent = message;
-            snackbar.className = 'snackbar';
-            
-            if (type === 'error') {
-                snackbar.classList.add('error');
-            } else if (type === 'warning') {
-                snackbar.classList.add('warning');
-            }
-            
-            snackbar.style.display = 'block';
-            
-            setTimeout(() => {
-                snackbar.style.display = 'none';
-            }, 3000);
-        }
-        
-        function validateEmail(email) {
-            const pattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-            return pattern.test(email);
-        }
-        
-        function validatePhone(phone) {
-            if (!phone) return true; // Phone is optional
-            const pattern = /^\+?1?\d{9,15}$/;
-            return pattern.test(phone);
-        }
-        
-        function generateId() {
-            return Date.now().toString(36) + Math.random().toString(36).substr(2);
-        }
-        
-        // User functions
-        function loginUser(email, password) {
-            const user = users.find(u => u.email === email && u.password === password);
-            if (user) {
-                currentUser = user;
-                showSnackbar(`Welcome back, ${user.username}! 👋`);
-                
-                if (user.role === 'admin') {
-                    showAdminDashboard();
-                } else {
-                    showUserDashboard();
-                }
-                return true;
-            }
-            return false;
-        }
-        
-        function registerUser(name, email, phone, password, confirmPassword) {
-            // Validation
-            if (!name || !email || !password || !confirmPassword) {
-                showSnackbar('Please fill in all required fields!', 'warning');
-                return false;
-            }
-            
-            if (!validateEmail(email)) {
-                showSnackbar('Please enter a valid email address!', 'warning');
-                return false;
-            }
-            
-            if (phone && !validatePhone(phone)) {
-                showSnackbar('Please enter a valid phone number!', 'warning');
-                return false;
-            }
-            
-            if (password !== confirmPassword) {
-                showSnackbar('Passwords do not match!', 'warning');
-                return false;
-            }
-            
-            if (password.length < 6) {
-                showSnackbar('Password must be at least 6 characters long!', 'warning');
-                return false;
-            }
-            
-            // Check if email already exists
-            if (users.some(u => u.email === email)) {
-                showSnackbar('Email already exists!', 'error');
-                return false;
-            }
-            
-            // Create new user
-            const newUser = {
-                id: generateId(),
-                username: name,
-                password: password,
-                email: email,
-                phone: phone,
-                role: 'user',
-                created_at: new Date().toISOString()
-            };
-            
-            users.push(newUser);
-            localStorage.setItem('users', JSON.stringify(users));
-            
-            showSnackbar('Account created successfully! 🎉');
-            return true;
-        }
-        
-        function logoutUser() {
-            if (currentUser && currentUser.role === 'admin') {
-                addAdminLog('LOGOUT', 'system', null, 'Admin user logged out');
-            }
-            
-            currentUser = null;
-            showSnackbar('See you soon! 👋');
-            showPage('login');
-        }
-        
-        // Report functions
-        function submitReport(problemType, location, issue, priority, photoData) {
-            if (!problemType || !location || !issue) {
-                showSnackbar('Please fill in all required fields! 📝', 'warning');
-                return false;
-            }
-            
-            const newReport = {
-                id: generateId(),
-                user_id: currentUser.id,
-                name: currentUser.username,
-                problem_type: problemType,
-                location: location,
-                issue: issue,
-                date: new Date().toLocaleString(),
-                status: 'Pending',
-                priority: priority,
-                photo_data: photoData,
-                latitude: '',
-                longitude: '',
-                created_at: new Date().toISOString()
-            };
-            
-            reports.push(newReport);
-            localStorage.setItem('reports', JSON.stringify(reports));
-            
-            showSnackbar('Report submitted successfully! ✅');
-            return true;
-        }
-        
-        function getUserReports() {
-            return reports.filter(report => report.user_id === currentUser.id);
-        }
-        
-        function getAllReports() {
-            return reports;
-        }
-        
-        function updateReportStatus(reportId, newStatus) {
-            const reportIndex = reports.findIndex(r => r.id === reportId);
-            if (reportIndex !== -1) {
-                reports[reportIndex].status = newStatus;
-                localStorage.setItem('reports', JSON.stringify(reports));
-                
-                // Add notification for the user
-                const report = reports[reportIndex];
-                addNotification(
-                    report.user_id,
-                    reportId,
-                    `Your report status has been updated to ${newStatus}`
-                );
-                
-                // Add admin log
-                if (currentUser.role === 'admin') {
-                    addAdminLog('UPDATE_STATUS', 'report', reportId, `Status changed to ${newStatus}`);
-                }
-                
-                showSnackbar(`Status updated to ${newStatus}!`);
-                return true;
-            }
-            return false;
-        }
-        
-        function deleteReport(reportId) {
-            const reportIndex = reports.findIndex(r => r.id === reportId);
-            if (reportIndex !== -1) {
-                const report = reports[reportIndex];
-                reports.splice(reportIndex, 1);
-                localStorage.setItem('reports', JSON.stringify(reports));
-                
-                // Add admin log
-                if (currentUser.role === 'admin') {
-                    addAdminLog('DELETE', 'report', reportId, `Deleted: ${report.problem_type} - ${report.location}`);
-                }
-                
-                showSnackbar('Report deleted successfully!');
-                return true;
-            }
-            return false;
-        }
-        
-        // Notification functions
-        function addNotification(userId, reportId, message, type = 'status_update') {
-            const newNotification = {
-                id: generateId(),
-                user_id: userId,
-                report_id: reportId,
-                message: message,
-                type: type,
-                is_read: false,
-                created_at: new Date().toISOString()
-            };
-            
-            notifications.push(newNotification);
-            localStorage.setItem('notifications', JSON.stringify(notifications));
-        }
-        
-        function getUserNotifications() {
-            return notifications.filter(notification => 
-                notification.user_id === currentUser.id
-            );
-        }
-        
-        function getUnreadNotificationsCount() {
-            return getUserNotifications().filter(n => !n.is_read).length;
-        }
-        
-        function markNotificationsAsRead() {
-            const userNotifications = getUserNotifications();
-            userNotifications.forEach(notification => {
-                notification.is_read = true;
-            });
-            localStorage.setItem('notifications', JSON.stringify(notifications));
-        }
-        
-        // Admin functions
-        function getAllUsers() {
-            return users.filter(user => user.id !== currentUser.id); // Exclude current admin
-        }
-        
-        function updateUserRole(userId, newRole) {
-            const userIndex = users.findIndex(u => u.id === userId);
-            if (userIndex !== -1) {
-                users[userIndex].role = newRole;
-                localStorage.setItem('users', JSON.stringify(users));
-                
-                addAdminLog('UPDATE_ROLE', 'user', userId, `Role changed to ${newRole}`);
-                showSnackbar(`User role updated to ${newRole}`);
-                return true;
-            }
-            return false;
-        }
-        
-        function deleteUser(userId) {
-            const userIndex = users.findIndex(u => u.id === userId);
-            if (userIndex !== -1) {
-                const user = users[userIndex];
-                
-                // Delete user's reports
-                reports = reports.filter(report => report.user_id !== userId);
-                localStorage.setItem('reports', JSON.stringify(reports));
-                
-                // Delete user
-                users.splice(userIndex, 1);
-                localStorage.setItem('users', JSON.stringify(users));
-                
-                addAdminLog('DELETE', 'user', userId, `Deleted user: ${user.username} and all their reports`);
-                showSnackbar('User and all their reports deleted successfully');
-                return true;
-            }
-            return false;
-        }
-        
-        function addAdminLog(action, targetType, targetId, details) {
-            const newLog = {
-                id: generateId(),
-                admin_id: currentUser.id,
-                action: action,
-                target_type: targetType,
-                target_id: targetId,
-                details: details,
-                created_at: new Date().toISOString()
-            };
-            
-            adminLogs.push(newLog);
-            localStorage.setItem('adminLogs', JSON.stringify(adminLogs));
-        }
-        
-        function getAdminLogs() {
-            return adminLogs.slice(-100).reverse(); // Last 100 logs, newest first
-        }
-        
-        function clearAdminLogs() {
-            adminLogs = [];
-            localStorage.setItem('adminLogs', JSON.stringify(adminLogs));
-            showSnackbar('Activity logs cleared');
-        }
-        
-        function getReportStats() {
-            const total = reports.length;
-            const pending = reports.filter(r => r.status === 'Pending').length;
-            const inProgress = reports.filter(r => r.status === 'In Progress').length;
-            const resolved = reports.filter(r => r.status === 'Resolved').length;
-            const myReports = currentUser ? reports.filter(r => r.user_id === currentUser.id).length : 0;
-            
-            return { total, pending, inProgress, resolved, myReports };
-        }
-        
-        // UI rendering functions
-        function showUserDashboard() {
-            showPage('userDashboard');
-            
-            // Update user name
-            document.getElementById('user-name').textContent = currentUser.username;
-            
-            // Update stats
-            const stats = getReportStats();
-            document.getElementById('user-reports-count').textContent = stats.myReports;
-            document.getElementById('user-pending-count').textContent = 
-                getUserReports().filter(r => r.status === 'Pending').length;
-            
-            // Update notification badge
-            const notificationCount = getUnreadNotificationsCount();
-            const notificationBadge = document.getElementById('notification-badge');
-            if (notificationCount > 0) {
-                notificationBadge.textContent = notificationCount;
-                notificationBadge.classList.remove('hidden');
-            } else {
-                notificationBadge.classList.add('hidden');
-            }
-            
-            // Clear form
-            document.getElementById('problem-type').value = '';
-            document.getElementById('location').value = '';
-            document.getElementById('issue').value = '';
-            document.getElementById('priority').value = '🟡 Medium';
-            document.getElementById('photo-preview-container').classList.add('hidden');
-            document.getElementById('clear-photo-btn').classList.add('hidden');
-        }
-        
-        function showAdminDashboard() {
-            showPage('adminDashboard');
-            updateAdminStats();
-            showAdminTab('reports');
-        }
-        
-        function updateAdminStats() {
-            const stats = getReportStats();
-            const statsGrid = document.getElementById('admin-stats');
-            
-            statsGrid.innerHTML = `
-                <div class="stat-card">
-                    <div class="stat-icon" style="color: var(--primary-color);">
-                        <i class="fas fa-file-alt"></i>
-                    </div>
-                    <div class="stat-value">${stats.total}</div>
-                    <div class="stat-label">Total</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon" style="color: var(--warning-color);">
-                        <i class="fas fa-clock"></i>
-                    </div>
-                    <div class="stat-value">${stats.pending}</div>
-                    <div class="stat-label">Pending</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon" style="color: var(--primary-color);">
-                        <i class="fas fa-tasks"></i>
-                    </div>
-                    <div class="stat-value">${stats.inProgress}</div>
-                    <div class="stat-label">In Progress</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon" style="color: var(--success-color);">
-                        <i class="fas fa-check-circle"></i>
-                    </div>
-                    <div class="stat-value">${stats.resolved}</div>
-                    <div class="stat-label">Resolved</div>
-                </div>
-            `;
-        }
-        
-        function showAdminTab(tabName) {
-            // Update tabs
-            document.querySelectorAll('.tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            document.querySelector(`.tab[data-tab="${tabName}"]`).classList.add('active');
-            
-            // Update tab content
-            document.querySelectorAll('.tab-content').forEach(content => {
-                content.classList.remove('active');
-            });
-            document.getElementById(`${tabName}-tab`).classList.add('active');
-            
-            // Load tab content
-            if (tabName === 'reports') {
-                loadAdminReports();
-            } else if (tabName === 'users') {
-                loadAdminUsers();
-            } else if (tabName === 'logs') {
-                loadAdminLogs();
-            }
-        }
-        
-        function loadAdminReports() {
-            const reportsList = document.getElementById('admin-reports-list');
-            const allReports = getAllReports();
-            
-            if (allReports.length === 0) {
-                reportsList.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-inbox"></i>
-                        <p>No community reports found.</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            reportsList.innerHTML = '';
-            
-            allReports.forEach(report => {
-                const statusColor = {
-                    'Pending': 'badge-pending',
-                    'In Progress': 'badge-in-progress',
-                    'Resolved': 'badge-resolved'
-                }[report.status] || 'badge-pending';
-                
-                const priorityClass = {
-                    '🟢 Low': 'badge-low',
-                    '🟡 Medium': 'badge-medium',
-                    '🔴 High': 'badge-high',
-                    '🚨 Emergency': 'badge-emergency'
-                }[report.priority] || 'badge-medium';
-                
-                const cleanPriority = report.priority.replace('🟢 ', '')
-                    .replace('🟡 ', '')
-                    .replace('🔴 ', '')
-                    .replace('🚨 ', '');
-                
-                const reportElement = document.createElement('div');
-                reportElement.className = 'list-item';
-                reportElement.innerHTML = `
-                    <div class="d-flex justify-between align-center">
-                        <div>
-                            <div class="list-item-title">${report.problem_type}</div>
-                            <div class="list-item-subtitle">
-                                By: ${report.name} • ${report.location} • ${report.status} ${report.photo_data ? '📷' : ''}
-                            </div>
-                        </div>
-                        <div class="d-flex align-center">
-                            <span class="badge ${statusColor}">${report.status}</span>
-                            <div style="margin-left: 8px; position: relative;">
-                                <button class="btn btn-secondary btn-sm admin-report-actions" data-id="${report.id}">
-                                    <i class="fas fa-ellipsis-v"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                
-                reportsList.appendChild(reportElement);
-            });
-            
-            // Add event listeners to action buttons
-            document.querySelectorAll('.admin-report-actions').forEach(button => {
-                button.addEventListener('click', function() {
-                    const reportId = this.getAttribute('data-id');
-                    const report = reports.find(r => r.id === reportId);
-                    showReportDetailModal(report, true);
-                });
-            });
-        }
-        
-        function loadAdminUsers() {
-            const usersList = document.getElementById('admin-users-list');
-            const allUsers = getAllUsers();
-            
-            if (allUsers.length === 0) {
-                usersList.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-users"></i>
-                        <p>No users found.</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            usersList.innerHTML = '';
-            
-            allUsers.forEach(user => {
-                const userElement = document.createElement('div');
-                userElement.className = 'list-item';
-                userElement.innerHTML = `
-                    <div class="d-flex justify-between align-center">
-                        <div>
-                            <div class="list-item-title">${user.username}</div>
-                            <div class="list-item-subtitle">${user.email} • ${user.role}</div>
-                        </div>
-                        <div>
-                            <button class="btn btn-secondary btn-sm admin-user-actions" data-id="${user.id}">
-                                <i class="fas fa-ellipsis-v"></i>
-                            </button>
-                        </div>
-                    </div>
-                `;
-                
-                usersList.appendChild(userElement);
-            });
-            
-            // Add event listeners to action buttons
-            document.querySelectorAll('.admin-user-actions').forEach(button => {
-                button.addEventListener('click', function() {
-                    const userId = this.getAttribute('data-id');
-                    const user = users.find(u => u.id === userId);
-                    showUserActionsModal(user);
-                });
-            });
-        }
-        
-        function loadAdminLogs() {
-            const logsList = document.getElementById('admin-logs-list');
-            const allLogs = getAdminLogs();
-            
-            if (allLogs.length === 0) {
-                logsList.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-history"></i>
-                        <p>No activity logs yet.</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            logsList.innerHTML = '';
-            
-            allLogs.forEach(log => {
-                const admin = users.find(u => u.id === log.admin_id);
-                const iconColor = {
-                    'DELETE': 'var(--danger-color)',
-                    'UPDATE_STATUS': 'var(--primary-color)',
-                    'UPDATE_ROLE': 'var(--warning-color)'
-                }[log.action] || 'var(--success-color)';
-                
-                const logElement = document.createElement('div');
-                logElement.className = 'list-item';
-                logElement.innerHTML = `
-                    <div class="d-flex align-center">
-                        <i class="fas fa-history" style="color: ${iconColor}; margin-right: 12px;"></i>
-                        <div style="flex: 1;">
-                            <div class="list-item-title" style="color: ${iconColor};">${log.action}</div>
-                            <div class="list-item-subtitle">By ${admin ? admin.username : 'Unknown'} • ${log.target_type} ${log.target_id ? '#' + log.target_id : ''}</div>
-                        </div>
-                        <div class="text-small text-muted">${new Date(log.created_at).toLocaleString()}</div>
-                    </div>
-                `;
-                
-                logsList.appendChild(logElement);
-            });
-        }
-        
-        function showMyReports() {
-            showPage('myReports');
-            const myReportsList = document.getElementById('my-reports-list');
-            const userReports = getUserReports();
-            
-            if (userReports.length === 0) {
-                myReportsList.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-file-alt"></i>
-                        <p>No reports yet</p>
-                        <p class="text-small">Submit your first community issue report</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            myReportsList.innerHTML = '';
-            
-            userReports.forEach(report => {
-                const cleanProblemType = report.problem_type.split(' ', 1)[-1] || report.problem_type;
-                
-                const statusColor = {
-                    'Pending': 'badge-pending',
-                    'In Progress': 'badge-in-progress',
-                    'Resolved': 'badge-resolved'
-                }[report.status] || 'badge-pending';
-                
-                const priorityClass = {
-                    '🟢 Low': 'badge-low',
-                    '🟡 Medium': 'badge-medium',
-                    '🔴 High': 'badge-high',
-                    '🚨 Emergency': 'badge-emergency'
-                }[report.priority] || 'badge-medium';
-                
-                const cleanPriority = report.priority.replace('🟢 ', '')
-                    .replace('🟡 ', '')
-                    .replace('🔴 ', '')
-                    .replace('🚨 ', '');
-                
-                const reportElement = document.createElement('div');
-                reportElement.className = 'card';
-                reportElement.innerHTML = `
-                    <div class="d-flex justify-between align-center mb-2">
-                        <span class="text-small text-muted">#${report.id}</span>
-                        <div class="d-flex align-center">
-                            <span class="badge ${statusColor}">${report.status}</span>
-                            <span class="badge-priority ${priorityClass}" style="margin-left: 8px;">${cleanPriority}</span>
-                        </div>
-                    </div>
-                    <h3 class="h3 mb-1">${cleanProblemType}</h3>
-                    <p class="text-muted mb-2">${report.location}</p>
-                    <p class="text-small text-muted mb-2">${report.date}</p>
-                    <button class="btn btn-secondary btn-sm view-report-details" data-id="${report.id}">
-                        <i class="fas fa-eye"></i> View Details
-                    </button>
-                `;
-                
-                myReportsList.appendChild(reportElement);
-            });
-            
-            // Add event listeners to view details buttons
-            document.querySelectorAll('.view-report-details').forEach(button => {
-                button.addEventListener('click', function() {
-                    const reportId = this.getAttribute('data-id');
-                    const report = reports.find(r => r.id === reportId);
-                    showReportDetailModal(report, false);
-                });
-            });
-        }
-        
-        function showNotifications() {
-            showPage('notifications');
-            markNotificationsAsRead();
-            
-            const notificationsList = document.getElementById('notifications-list');
-            const userNotifications = getUserNotifications();
-            
-            if (userNotifications.length === 0) {
-                notificationsList.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-bell-slash"></i>
-                        <p>No notifications</p>
-                        <p class="text-small">You're all caught up! 🎉</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            notificationsList.innerHTML = '';
-            
-            userNotifications.forEach(notification => {
-                const notificationElement = document.createElement('div');
-                notificationElement.className = 'card';
-                notificationElement.innerHTML = `
-                    <p class="mb-1">${notification.message}</p>
-                    <p class="text-small text-muted">${new Date(notification.created_at).toLocaleString()}</p>
-                `;
-                
-                notificationsList.appendChild(notificationElement);
-            });
-        }
-        
-        function showReportDetailModal(report, isAdmin = false) {
-            const modal = document.getElementById('report-detail-modal');
-            const content = document.getElementById('report-detail-content');
-            
-            const cleanProblemType = report.problem_type.split(' ', 1)[-1] || report.problem_type;
-            const cleanPriority = report.priority.replace('🟢 ', '')
-                .replace('🟡 ', '')
-                .replace('🔴 ', '')
-                .replace('🚨 ', '');
-            
-            const statusColor = {
-                'Pending': 'badge-pending',
-                'In Progress': 'badge-in-progress',
-                'Resolved': 'badge-resolved'
-            }[report.status] || 'badge-pending';
-            
-            const priorityClass = {
-                '🟢 Low': 'badge-low',
-                '🟡 Medium': 'badge-medium',
-                '🔴 High': 'badge-high',
-                '🚨 Emergency': 'badge-emergency'
-            }[report.priority] || 'badge-medium';
-            
-            let actionsHTML = '';
-            if (isAdmin) {
-                actionsHTML = `
-                    <div class="action-buttons">
-                        <button class="btn btn-secondary" id="mark-in-progress-btn" data-id="${report.id}">
-                            <i class="fas fa-sync-alt"></i> Mark In Progress
-                        </button>
-                        <button class="btn btn-secondary" id="mark-resolved-btn" data-id="${report.id}">
-                            <i class="fas fa-check-circle"></i> Mark Resolved
-                        </button>
-                    </div>
-                `;
-            }
-            
-            content.innerHTML = `
-                <div class="d-flex justify-between align-center mb-2">
-                    <h3 class="h3">Report #${report.id}</h3>
-                    <span class="badge ${statusColor}">${report.status}</span>
-                </div>
-                
-                <div class="mb-3">
-                    <h4 class="h4 mb-1">Reporter Information</h4>
-                    <div class="card">
-                        <div class="d-flex align-center mb-1">
-                            <i class="fas fa-user" style="color: var(--gray-500); margin-right: 8px;"></i>
-                            <span class="text-muted" style="width: 80px;">Name:</span>
-                            <span>${report.name}</span>
-                        </div>
-                        <div class="d-flex align-center">
-                            <i class="fas fa-envelope" style="color: var(--gray-500); margin-right: 8px;"></i>
-                            <span class="text-muted" style="width: 80px;">Username:</span>
-                            <span>${report.name}</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="mb-3">
-                    <h4 class="h4 mb-1">Report Details</h4>
-                    <div class="card">
-                        <div class="d-flex align-center mb-1">
-                            <i class="fas fa-tag" style="color: var(--gray-500); margin-right: 8px;"></i>
-                            <span class="text-muted" style="width: 100px;">Problem Type:</span>
-                            <span>${cleanProblemType}</span>
-                        </div>
-                        <div class="d-flex align-center mb-1">
-                            <i class="fas fa-map-marker-alt" style="color: var(--gray-500); margin-right: 8px;"></i>
-                            <span class="text-muted" style="width: 100px;">Location:</span>
-                            <span>${report.location}</span>
-                        </div>
-                        <div class="d-flex align-center mb-1">
-                            <i class="fas fa-flag" style="color: var(--gray-500); margin-right: 8px;"></i>
-                            <span class="text-muted" style="width: 100px;">Priority:</span>
-                            <span class="badge-priority ${priorityClass}">${cleanPriority}</span>
-                        </div>
-                        <div class="d-flex align-center mb-1">
-                            <i class="fas fa-calendar" style="color: var(--gray-500); margin-right: 8px;"></i>
-                            <span class="text-muted" style="width: 100px;">Report Date:</span>
-                            <span>${report.date}</span>
-                        </div>
-                        <div class="d-flex align-center">
-                            <i class="fas fa-clock" style="color: var(--gray-500); margin-right: 8px;"></i>
-                            <span class="text-muted" style="width: 100px;">Created At:</span>
-                            <span>${new Date(report.created_at).toLocaleString()}</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="mb-3">
-                    <h4 class="h4 mb-1">Description</h4>
-                    <div class="card">
-                        <p>${report.issue}</p>
-                    </div>
-                </div>
-                
-                ${report.photo_data ? `
-                <div class="mb-3">
-                    <h4 class="h4 mb-1">Attached Photo</h4>
-                    <img src="${report.photo_data}" class="report-image" alt="Report photo">
-                </div>
-                ` : `
-                <div class="mb-3">
-                    <h4 class="h4 mb-1">Attached Photo</h4>
-                    <div class="empty-state">
-                        <i class="fas fa-camera"></i>
-                        <p>No photo was attached to this report</p>
-                    </div>
-                </div>
-                `}
-                
-                ${actionsHTML}
-            `;
-            
-            modal.style.display = 'flex';
-            
-            // Add event listeners to action buttons if admin
-            if (isAdmin) {
-                document.getElementById('mark-in-progress-btn').addEventListener('click', function() {
-                    const reportId = this.getAttribute('data-id');
-                    updateReportStatus(reportId, 'In Progress');
-                    modal.style.display = 'none';
-                    loadAdminReports();
-                    updateAdminStats();
-                });
-                
-                document.getElementById('mark-resolved-btn').addEventListener('click', function() {
-                    const reportId = this.getAttribute('data-id');
-                    updateReportStatus(reportId, 'Resolved');
-                    modal.style.display = 'none';
-                    loadAdminReports();
-                    updateAdminStats();
-                });
-            }
-        }
-        
-        function showUserActionsModal(user) {
-            const modal = document.getElementById('confirm-modal');
-            const title = document.getElementById('confirm-modal-title');
-            const message = document.getElementById('confirm-modal-message');
-            const confirmBtn = document.getElementById('confirm-action-btn');
-            
-            title.textContent = 'User Actions';
-            message.innerHTML = `
-                <p>User: <strong>${user.username}</strong></p>
-                <p>Email: ${user.email}</p>
-                <p>Current Role: ${user.role}</p>
-            `;
-            
-            confirmBtn.textContent = user.role === 'user' ? 'Make Admin' : 'Make User';
-            confirmBtn.onclick = function() {
-                const newRole = user.role === 'user' ? 'admin' : 'user';
-                updateUserRole(user.id, newRole);
-                modal.style.display = 'none';
-                loadAdminUsers();
-            };
-            
-            // Add delete button
-            const deleteBtn = document.createElement('button');
-            deleteBtn.className = 'btn btn-danger';
-            deleteBtn.textContent = 'Delete User';
-            deleteBtn.onclick = function() {
-                showConfirmModal(
-                    'Confirm Delete',
-                    'Are you sure you want to delete this user? All their reports will also be deleted.',
-                    function() {
-                        deleteUser(user.id);
-                        modal.style.display = 'none';
-                        loadAdminUsers();
-                        updateAdminStats();
-                    }
-                );
-            };
-            
-            const actionButtons = document.querySelector('.action-buttons');
-            actionButtons.innerHTML = '';
-            actionButtons.appendChild(confirmBtn);
-            actionButtons.appendChild(deleteBtn);
-            
-            modal.style.display = 'flex';
-        }
-        
-        function showConfirmModal(title, message, onConfirm) {
-            const modal = document.getElementById('confirm-modal');
-            const modalTitle = document.getElementById('confirm-modal-title');
-            const modalMessage = document.getElementById('confirm-modal-message');
-            const confirmBtn = document.getElementById('confirm-action-btn');
-            
-            modalTitle.textContent = title;
-            modalMessage.textContent = message;
-            confirmBtn.textContent = title.includes('Delete') ? 'Delete' : 'Confirm';
-            confirmBtn.className = title.includes('Delete') ? 'btn btn-danger' : 'btn btn-primary';
-            
-            confirmBtn.onclick = onConfirm;
-            
-            modal.style.display = 'flex';
-        }
-        
-        // Event listeners
-        document.addEventListener('DOMContentLoaded', function() {
-            // Login page
-            document.getElementById('login-btn').addEventListener('click', function() {
-                const email = document.getElementById('login-email').value;
-                const password = document.getElementById('login-password').value;
-                
-                if (!email || !password) {
-                    showSnackbar('Please fill in all fields!', 'warning');
-                    return;
-                }
-                
-                if (!loginUser(email, password)) {
-                    showSnackbar('Invalid email or password!', 'error');
-                }
-            });
-            
-            document.getElementById('go-to-register').addEventListener('click', function(e) {
-                e.preventDefault();
-                showPage('register');
-            });
-            
-            // Register page
-            document.getElementById('register-back').addEventListener('click', function() {
-                showPage('login');
-            });
-            
-            document.getElementById('register-btn').addEventListener('click', function() {
-                const name = document.getElementById('register-name').value;
-                const email = document.getElementById('register-email').value;
-                const phone = document.getElementById('register-phone').value;
-                const password = document.getElementById('register-password').value;
-                const confirmPassword = document.getElementById('register-confirm-password').value;
-                
-                if (registerUser(name, email, phone, password, confirmPassword)) {
-                    showPage('login');
-                }
-            });
-            
-            // User dashboard
-            document.getElementById('submit-report-btn').addEventListener('click', function() {
-                const problemType = document.getElementById('problem-type').value;
-                const location = document.getElementById('location').value;
-                const issue = document.getElementById('issue').value;
-                const priority = document.getElementById('priority').value;
-                const photoData = document.getElementById('photo-preview').src || null;
-                
-                if (submitReport(problemType, location, issue, priority, photoData)) {
-                    // Clear form
-                    document.getElementById('problem-type').value = '';
-                    document.getElementById('location').value = '';
-                    document.getElementById('issue').value = '';
-                    document.getElementById('priority').value = '🟡 Medium';
-                    document.getElementById('photo-preview-container').classList.add('hidden');
-                    document.getElementById('clear-photo-btn').classList.add('hidden');
-                    
-                    // Update stats
-                    const stats = getReportStats();
-                    document.getElementById('user-reports-count').textContent = stats.myReports;
-                    document.getElementById('user-pending-count').textContent = 
-                        getUserReports().filter(r => r.status === 'Pending').length;
-                }
-            });
-            
-            document.getElementById('upload-photo-btn').addEventListener('click', function() {
-                // In a real app, this would open a file picker
-                // For demo purposes, we'll use a placeholder image
-                const placeholderImage = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iI2YxZjVmOSIvPjx0ZXh0IHg9IjEwMCIgeT0iMTAwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTgiIGZpbGw9IiM5NGEzYjgiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5QaG90byBQcmV2aWV3PC90ZXh0Pjwvc3ZnPg==';
-                
-                document.getElementById('photo-preview').src = placeholderImage;
-                document.getElementById('photo-preview-container').classList.remove('hidden');
-                document.getElementById('clear-photo-btn').classList.remove('hidden');
-            });
-            
-            document.getElementById('clear-photo-btn').addEventListener('click', function() {
-                document.getElementById('photo-preview-container').classList.add('hidden');
-                this.classList.add('hidden');
-                showSnackbar('Photo removed', 'warning');
-            });
-            
-            document.getElementById('my-reports-btn').addEventListener('click', showMyReports);
-            document.getElementById('user-notifications-btn').addEventListener('click', showNotifications);
-            document.getElementById('user-logout-btn').addEventListener('click', logoutUser);
-            document.getElementById('notification-btn').addEventListener('click', showNotifications);
-            
-            // My Reports page
-            document.getElementById('my-reports-back').addEventListener('click', showUserDashboard);
-            
-            // Notifications page
-            document.getElementById('notifications-back').addEventListener('click', showUserDashboard);
-            
-            // Admin dashboard
-            document.querySelectorAll('.tab').forEach(tab => {
-                tab.addEventListener('click', function() {
-                    showAdminTab(this.getAttribute('data-tab'));
-                });
-            });
-            
-            document.getElementById('refresh-reports-btn').addEventListener('click', function() {
-                loadAdminReports();
-                updateAdminStats();
-                showSnackbar('Reports refreshed!');
-            });
-            
-            document.getElementById('refresh-users-btn').addEventListener('click', function() {
-                loadAdminUsers();
-                showSnackbar('Users refreshed!');
-            });
-            
-            document.getElementById('refresh-logs-btn').addEventListener('click', function() {
-                loadAdminLogs();
-                showSnackbar('Logs refreshed!');
-            });
-            
-            document.getElementById('clear-logs-btn').addEventListener('click', function() {
-                showConfirmModal(
-                    'Clear All Logs',
-                    'Are you sure you want to clear all activity logs?',
-                    function() {
-                        clearAdminLogs();
-                        loadAdminLogs();
-                    }
-                );
-            });
-            
-            document.getElementById('admin-logout-btn').addEventListener('click', logoutUser);
-            
-            // Modal close buttons
-            document.getElementById('close-report-modal').addEventListener('click', function() {
-                document.getElementById('report-detail-modal').style.display = 'none';
-            });
-            
-            document.getElementById('close-confirm-modal').addEventListener('click', function() {
-                document.getElementById('confirm-modal').style.display = 'none';
-            });
-            
-            document.getElementById('cancel-action-btn').addEventListener('click', function() {
-                document.getElementById('confirm-modal').style.display = 'none';
-            });
-            
-            // Close modals when clicking outside
-            window.addEventListener('click', function(e) {
-                const reportModal = document.getElementById('report-detail-modal');
-                const confirmModal = document.getElementById('confirm-modal');
-                
-                if (e.target === reportModal) {
-                    reportModal.style.display = 'none';
-                }
-                
-                if (e.target === confirmModal) {
-                    confirmModal.style.display = 'none';
-                }
-            });
-        });
-    </script>
+    <!-- Snackbar -->
+    <div id="snackbar" class="snackbar"></div>
+
+    <script src="app.js"></script>
 </body>
-
-
 </html>
-
