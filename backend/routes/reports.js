@@ -1,5 +1,5 @@
 const express = require('express');
-const { supabase } = require('../database/supabase'); // ✅ Changed from database to supabase
+const { supabase } = require('../database/supabase');
 const auth = require('../middleware/auth');
 
 const router = express.Router();
@@ -44,7 +44,7 @@ router.get('/my-reports', auth, async (req, res) => {
     }
 });
 
-// Create new report
+// Create new report with photo
 router.post('/', auth, async (req, res) => {
     const { problem_type, location, issue, priority, photo_data } = req.body;
 
@@ -53,6 +53,16 @@ router.post('/', auth, async (req, res) => {
     }
 
     try {
+        // Validate photo data if provided
+        let processedPhotoData = null;
+        if (photo_data && photo_data.startsWith('data:image')) {
+            // Basic validation for base64 image
+            if (photo_data.length > 5 * 1024 * 1024) { // 5MB limit
+                return res.status(400).json({ message: 'Image too large (max 5MB)' });
+            }
+            processedPhotoData = photo_data;
+        }
+
         const { data: report, error } = await supabase
             .from('reports')
             .insert([
@@ -64,7 +74,8 @@ router.post('/', auth, async (req, res) => {
                     issue,
                     date: new Date().toISOString(),
                     priority: priority || 'Medium',
-                    photo_data: photo_data || null
+                    photo_data: processedPhotoData,
+                    status: 'Pending'
                 }
             ])
             .select()
@@ -121,19 +132,6 @@ router.put('/:id/status', auth, async (req, res) => {
                 }
             ]);
 
-        // Add admin log
-        await supabase
-            .from('admin_logs')
-            .insert([
-                {
-                    admin_id: req.user.id,
-                    action: 'UPDATE_STATUS',
-                    target_type: 'report',
-                    target_id: reportId,
-                    details: `Status changed to ${status}`
-                }
-            ]);
-
         res.json({ message: 'Report status updated successfully' });
     } catch (error) {
         console.error('Error updating report:', error);
@@ -150,38 +148,12 @@ router.delete('/:id', auth, async (req, res) => {
     const reportId = req.params.id;
 
     try {
-        // Get report details for log
-        const { data: report, error: reportError } = await supabase
-            .from('reports')
-            .select('problem_type, location')
-            .eq('id', reportId)
-            .single();
-
-        if (reportError) throw reportError;
-        if (!report) {
-            return res.status(404).json({ message: 'Report not found' });
-        }
-
-        // Delete report
         const { error: deleteError } = await supabase
             .from('reports')
             .delete()
             .eq('id', reportId);
 
         if (deleteError) throw deleteError;
-
-        // Add admin log
-        await supabase
-            .from('admin_logs')
-            .insert([
-                {
-                    admin_id: req.user.id,
-                    action: 'DELETE',
-                    target_type: 'report',
-                    target_id: reportId,
-                    details: `Deleted: ${report.problem_type} - ${report.location}`
-                }
-            ]);
 
         res.json({ message: 'Report deleted successfully' });
     } catch (error) {
