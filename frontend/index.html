@@ -676,19 +676,23 @@
                     </select>
                 </div>
                 
-                <div class="form-group">
+                <!-- In the user dashboard card, replace the photo upload section with this: -->
+<div class="form-group">
     <label class="form-label">Attach Photo</label>
-    <div class="d-flex justify-between align-center">
+    <div class="d-flex justify-between align-center mb-2">
         <button class="btn btn-secondary btn-sm" id="upload-photo-btn" type="button">
             <i class="fas fa-camera"></i> Take Photo
         </button>
         <button class="btn btn-secondary btn-sm" id="choose-photo-btn" type="button">
-            <i class="fas fa-image"></i> Choose from Gallery
+            <i class="fas fa-image"></i> Choose Photo
         </button>
     </div>
+    
+    <!-- Hidden file inputs -->
     <input type="file" id="photo-input" accept="image/*" capture="environment" style="display: none;">
     <input type="file" id="gallery-input" accept="image/*" style="display: none;">
     
+    <!-- Photo preview -->
     <div id="photo-preview-container" class="mt-2 hidden">
         <img id="photo-preview" class="photo-preview" src="" alt="Photo preview">
         <button class="btn btn-danger btn-sm mt-1" id="clear-photo-btn" type="button">
@@ -1908,3 +1912,4 @@
 
 
 </html>
+
