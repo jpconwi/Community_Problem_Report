@@ -1062,4 +1062,111 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Show login page by default
     showPage('login');
+
+    // Add these event listeners to fix navigation and login issues
+document.getElementById('my-reports-btn').addEventListener('click', function(e) {
+    e.preventDefault();
+    showMyReports();
 });
+
+document.getElementById('user-notifications-btn').addEventListener('click', function(e) {
+    e.preventDefault();
+    showNotifications();
+});
+
+document.getElementById('back-to-dashboard').addEventListener('click', function(e) {
+    e.preventDefault();
+    showUserDashboard();
+});
+
+document.getElementById('back-to-dashboard-2').addEventListener('click', function(e) {
+    e.preventDefault();
+    showUserDashboard();
+});
+
+document.getElementById('public-login-link').addEventListener('click', function(e) {
+    e.preventDefault();
+    showPage('login');
+});
+
+// Fix navigation visibility based on user role
+function updateNavigation() {
+    const userNav = document.getElementById('user-nav');
+    const adminNav = document.getElementById('admin-nav');
+    const publicNav = document.getElementById('public-nav');
+    
+    // Hide all navs first
+    userNav.classList.add('hidden');
+    adminNav.classList.add('hidden');
+    publicNav.classList.add('hidden');
+    
+    if (currentUser) {
+        if (currentUser.role === 'admin') {
+            adminNav.classList.remove('hidden');
+        } else {
+            userNav.classList.remove('hidden');
+        }
+    } else {
+        publicNav.classList.remove('hidden');
+    }
+}
+
+// Update the login and logout functions to call updateNavigation
+async function loginUser(email, password) {
+    const data = await apiCall('/auth/login', {
+        method: 'POST',
+        body: { email, password }
+    });
+    
+    authToken = data.token;
+    currentUser = data.user;
+    localStorage.setItem('authToken', authToken);
+    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+    
+    updateNavigation(); // Add this line
+    return data;
+}
+
+async function logoutUser() {
+    try {
+        await apiCall('/auth/logout', { method: 'POST' });
+    } catch (error) {
+        console.error('Logout error:', error);
+    } finally {
+        authToken = null;
+        currentUser = null;
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('currentUser');
+        updateNavigation(); // Add this line
+        showSnackbar('See you soon! 👋');
+        showPage('login');
+    }
+}
+
+// Also call updateNavigation when the app loads
+document.addEventListener('DOMContentLoaded', function() {
+    // ... existing code ...
+    
+    // Check if user is already logged in
+    const savedToken = localStorage.getItem('authToken');
+    const savedUser = localStorage.getItem('currentUser');
+    
+    if (savedToken && savedUser) {
+        authToken = savedToken;
+        currentUser = JSON.parse(savedUser);
+        updateNavigation(); // Add this line
+        
+        if (currentUser.role === 'admin') {
+            showAdminDashboard();
+        } else {
+            showUserDashboard();
+        }
+    } else {
+        showPage('login');
+        updateNavigation(); // Add this line
+    }
+    
+    // ... rest of existing code ...
+});
+});
+
