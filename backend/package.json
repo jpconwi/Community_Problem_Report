@@ -1,5 +1,5 @@
 {
-  "name": "communitycare-global",
+  "name": "communitycare-backend",
   "version": "2.0.0",
   "description": "Global community problem reporting system with photo upload",
   "main": "server.js",
