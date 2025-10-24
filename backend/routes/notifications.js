@@ -1,5 +1,5 @@
 const express = require('express');
-const { supabase } = require('../database/supabase'); // ✅ Changed from database to supabase
+const { supabase } = require('../database/supabase');
 const auth = require('../middleware/auth');
 
 const router = express.Router();
@@ -9,15 +9,12 @@ router.get('/', auth, async (req, res) => {
     try {
         const { data: notifications, error } = await supabase
             .from('notifications')
-            .select(`
-                *,
-                reports:report_id (problem_type)
-            `)
+            .select('*')
             .eq('user_id', req.user.id)
             .order('created_at', { ascending: false });
 
         if (error) throw error;
-        res.json({ notifications });
+        res.json({ notifications: notifications || [] });
     } catch (error) {
         console.error('Error fetching notifications:', error);
         res.status(500).json({ message: 'Database error' });
