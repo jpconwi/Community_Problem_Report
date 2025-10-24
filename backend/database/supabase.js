@@ -40,7 +40,7 @@ async function initDatabase() {
             .single();
 
         if (!adminUser) {
-            const hashedPassword = bcrypt.hashSync('admin123', 10);
+            const hashedPassword = await bcrypt.hash('admin123', 10);
             const { error } = await supabase
                 .from('users')
                 .insert([
@@ -48,7 +48,8 @@ async function initDatabase() {
                         username: 'admin',
                         password: hashedPassword,
                         email: 'admin@community.com',
-                        role: 'admin'
+                        role: 'admin',
+                        created_at: new Date().toISOString()
                     }
                 ]);
 
