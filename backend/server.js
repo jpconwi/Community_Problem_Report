@@ -5,14 +5,22 @@ const path = require('path');
 const authRoutes = require('./routes/auth');
 const reportRoutes = require('./routes/reports');
 const userRoutes = require('./routes/users');
-const { initDatabase } = require('./database/supabase'); // ✅ Changed to supabase
+const { initDatabase } = require('./database/supabase');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware
-app.use(cors());
+// Middleware - Updated CORS for production
+app.use(cors({
+    origin: [
+        'https://jpconwi.github.io',
+        'http://localhost:3000'
+    ],
+    credentials: true
+}));
 app.use(express.json({ limit: '10mb' }));
+
+// Serve frontend from Render (optional - you can keep using GitHub Pages)
 app.use(express.static(path.join(__dirname, '../frontend')));
 
 // Routes
@@ -26,12 +34,13 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '../frontend/index.html'));
 });
 
-// Health check
+// Health check endpoint
 app.get('/api/health', (req, res) => {
     res.json({ 
         status: 'OK', 
         message: 'CommunityCare API is running',
         database: 'Supabase',
+        environment: process.env.NODE_ENV || 'development',
         timestamp: new Date().toISOString()
     });
 });
@@ -39,9 +48,13 @@ app.get('/api/health', (req, res) => {
 // Initialize database and start server
 initDatabase().then(() => {
     app.listen(PORT, () => {
-        console.log(`🚀 Server running on http://localhost:${PORT}`);
-        console.log(`📁 Frontend: ${path.join(__dirname, '../frontend')}`);
+        console.log(`🚀 Server running on port ${PORT}`);
+        console.log(`🌐 Environment: ${process.env.NODE_ENV || 'development'}`);
         console.log(`🔗 Health: http://localhost:${PORT}/api/health`);
+        
+        if (process.env.NODE_ENV === 'production') {
+            console.log('✅ Production mode enabled');
+        }
     });
 }).catch(error => {
     console.error('❌ Failed to start server:', error);
