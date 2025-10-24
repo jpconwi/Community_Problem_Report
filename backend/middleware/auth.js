@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 
-const JWT_SECRET = 'your-secret-key-here';
+const JWT_SECRET = process.env.JWT_SECRET || 'communitycare-secret-key-2024';
 
 function authenticateToken(req, res, next) {
     const authHeader = req.headers['authorization'];
