@@ -60,7 +60,7 @@ router.post('/login', async (req, res) => {
 
 // Register
 router.post('/register', async (req, res) => {
-    const { username, email, password } = req.body;
+    const { username, email, password, phone } = req.body;
 
     if (!username || !email || !password) {
         return res.status(400).json({ message: 'Username, email, and password are required' });
@@ -72,11 +72,15 @@ router.post('/register', async (req, res) => {
 
     try {
         // Check if user already exists
-        const { data: existingUser } = await supabase
+        const { data: existingUser, error: checkError } = await supabase
             .from('users')
             .select('id')
             .or(`email.eq.${email},username.eq.${username}`)
             .single();
+
+        if (checkError && checkError.code !== 'PGRST116') {
+            console.error('Check user error:', checkError);
+        }
 
         if (existingUser) {
             return res.status(409).json({ message: 'User already exists with this email or username' });
@@ -93,6 +97,7 @@ router.post('/register', async (req, res) => {
                     username: username,
                     password: hashedPassword,
                     email: email,
+                    phone: phone || null,
                     role: 'user',
                     created_at: new Date().toISOString()
                 }
@@ -102,7 +107,7 @@ router.post('/register', async (req, res) => {
 
         if (insertError) {
             console.error('Insert error:', insertError);
-            return res.status(500).json({ message: 'Error creating user' });
+            return res.status(500).json({ message: 'Error creating user: ' + insertError.message });
         }
 
         res.status(201).json({
@@ -111,7 +116,7 @@ router.post('/register', async (req, res) => {
         });
     } catch (error) {
         console.error('Registration error:', error);
-        return res.status(500).json({ message: 'Server error' });
+        return res.status(500).json({ message: 'Server error: ' + error.message });
     }
 });
 
